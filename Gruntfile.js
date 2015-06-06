@@ -130,23 +130,6 @@ module.exports = function (grunt) {
           'server/**/*.js',
           '!server/**/*.spec.js'
         ]
-      },
-      serverTest: {
-        options: {
-          jshintrc: 'server/.jshintrc-spec'
-        },
-        src: ['server/**/*.spec.js']
-      },
-      all: [
-        '<%= yeoman.client %>/{app,components}/**/*.js',
-        '!<%= yeoman.client %>/{app,components}/**/*.spec.js',
-        '!<%= yeoman.client %>/{app,components}/**/*.mock.js'
-      ],
-      test: {
-        src: [
-          '<%= yeoman.client %>/{app,components}/**/*.spec.js',
-          '<%= yeoman.client %>/{app,components}/**/*.mock.js'
-        ]
       }
     },
 
@@ -403,11 +386,11 @@ module.exports = function (grunt) {
     concurrent: {
       server: [
         'jade',
-        'less',
+        'less'
       ],
       test: [
         'jade',
-        'less',
+        'less'
       ],
       debug: {
         tasks: [
@@ -539,7 +522,7 @@ module.exports = function (grunt) {
           ]
         }
       }
-    },
+    }
   });
 
   // Used for delaying livereload until after server has restarted
@@ -600,7 +583,7 @@ module.exports = function (grunt) {
     return grunt.task.run([
       'env:all',
       'env:test',
-      'test:server'
+      'mochaTest'
     ]);
   });
 
