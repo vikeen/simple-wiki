@@ -1,7 +1,3 @@
-/**
- * Express configuration
- */
-
 'use strict';
 
 var express = require('express');
@@ -25,7 +21,13 @@ module.exports = function(app) {
   app.use(bodyParser.json());
   app.use(methodOverride());
   app.use(cookieParser());
-  
+
+  app.use(function(req, res, next) {
+    req.simpleWiki = req.simpleWiki || {};
+    req.simpleWiki.pagePath = path.resolve(config.root, 'server/pages');
+    next();
+  });
+
   if ('production' === env) {
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));
     app.use(express.static(path.join(config.root, 'public')));

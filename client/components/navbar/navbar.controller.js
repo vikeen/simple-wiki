@@ -5,11 +5,14 @@ angular.module('simpleWikiApp')
     $scope.menu = [{
       'title': 'Home',
       'link': '/'
+    }, {
+      'title': 'Pages',
+      'link': '/pages'
     }];
 
     $scope.isCollapsed = true;
 
-    $scope.isActive = function(route) {
+    $scope.isActive = function (route) {
       return route === $location.path();
     };
   });
