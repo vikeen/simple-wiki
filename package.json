@@ -1,6 +1,23 @@
 {
   "name": "simple-wiki",
   "version": "1.0.0",
+  "description": "Simple file system based wiki for Nodejs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vikeen/simple-wiki.git"
+  },
+  "keywords": [
+    "wiki",
+    "wikipedia",
+    "simple",
+    "node"
+  ],
+  "author": "John Rake",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/vikeen/simple-wiki/issues"
+  },
+  "homepage": "https://github.com/vikeen/simple-wiki",
   "main": "server/app.js",
   "dependencies": {
     "body-parser": "~1.5.0",
@@ -46,7 +63,7 @@
     "grunt-dom-munger": "^3.4.0",
     "grunt-protractor-runner": "^1.1.0",
     "grunt-asset-injector": "^0.1.0",
-    "grunt-build-control": "DaftMonk/grunt-build-control",
+    "grunt-build-control": "git+https://github.com/DaftMonk/grunt-build-control",
     "grunt-mocha-test": "~0.10.2",
     "jit-grunt": "^0.5.0",
     "time-grunt": "~0.3.1",
