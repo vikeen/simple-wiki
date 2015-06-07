@@ -15,7 +15,7 @@ div(ng-include='"components/navbar/navbar.html"')
     form.md-padding(flex='50')
       legend Preview
       h1.headline {{pageCreateCtrl.newPage.title}}
-      div(ng-bind-html='pageCreateCtrl.newPage.content | markdown')
+      md-content(ng-bind-html='pageCreateCtrl.newPage.content | markdown')
   md-content.md-padding(hide-gt-md)
     md-tabs(md-dynamic-height md-border-bottom)
       md-tab(label='write')
@@ -31,7 +31,7 @@ div(ng-include='"components/navbar/navbar.html"')
                 textarea.form-control(ng-model='pageCreateCtrl.newPage.content' id='content' name='content' rows='24' required)
       md-tab(label='preview' ng-disabled='!pageCreateCtrl.newPage.content')
         h1.headline {{pageCreateCtrl.newPage.title}}
-        md-content.md-padding(ng-bind-html='pageCreateCtrl.newPage.content | markdown')
+        md-content(ng-bind-html='pageCreateCtrl.newPage.content | markdown')
 
   .control-group
     md-button.md-raised.md-primary(ng-click='pageCreateCtrl.onSubmit(pageCreateForm)') Submit

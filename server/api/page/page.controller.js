@@ -33,33 +33,34 @@ function create(req, res) {
     page.compiledContent = marked(page.content);
   } else {
     _handleError('ERROR_UNSUPPORTED_CONTENT_TYPE');
-    return res.send(500);
+    return res.status(500);
   }
 
-  fs.readdir(req.simpleWiki.pagePath, function (err, files) {
+  _pageExists(req.simpleWiki.pagePath, page.title, function (err, exists) {
     if (err) {
-      _handleError(err, 'ERROR_PAGE_DIRECTORY');
-      return res.send(500);
+      _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
+      return res.status(500).json({
+        error: 'ERROR_PERFORMING_FILE_LOOKUP'
+      });
     }
 
-    if (files.indexOf(sha1(page.title) + '.json') >= 0) {
-      _handleError(err, 'ERROR_PAGE_ALREADY_EXISTS');
+    if (exists) {
+      _handleError(null, 'ERROR_PAGE_ALREADY_EXISTS');
       return res.status(500).json({
         error: 'ERROR_PAGE_ALREADY_EXISTS'
       });
-    } else {
-      var filePath = _getPageFilePath(req.simpleWiki.pagePath, page.title),
-        fileData = JSON.stringify(page);
-
-      fs.writeFile(filePath, fileData, 'utf-8', function (err) {
-        if (err) {
-          _handleError(err, 'ERROR_PAGE_CREATION');
-          res.send(500);
-        } else {
-          res.send(200);
-        }
-      })
     }
+
+    var filePath = _getPageFilePath(req.simpleWiki.pagePath, page.title);
+    _writePage(filePath, JSON.stringify(page), function (err, success) {
+      if (err) {
+        return res.status(500).json({
+          error: err
+        });
+      }
+
+      return res.status(200).json(page);
+    });
   });
 }
 
@@ -75,12 +76,12 @@ function index(req, res) {
     files.forEach(function (fileName) {
       count++;
 
-      fs.readFile(path.join(req.simpleWiki.pagePath, fileName), 'utf-8', function (err, data) {
+      _readPage(path.join(req.simpleWiki.pagePath, fileName), function (err, data) {
         if (err) {
-          _handleError(err, 'ERROR_PAGE');
-          return res.send(500);
+          return res.send(500).json({
+            error: 'ERROR_READING_FROM_PAGE'
+          });
         }
-
 
         ret.push(JSON.parse(data));
 
@@ -106,60 +107,63 @@ function show(req, res) {
 }
 
 function update(req, res) {
-  fs.readdir(req.simpleWiki.pagePath, function (err, files) {
-    if (err) {
-      _handleError(err, 'ERROR_PAGE_DIRECTORY');
+  var page = {
+    readableTitle: req.body.title,
+    content: req.body.content,
+    contentType: req.body.contentType || 'markdown',
+    title: _normalizePageTitle(req.body.readableTitle),
+    updated: new Date()
+  };
+
+  _pageExists(req.simpleWiki.pagePath, page.title, function (err, exists) {
+    if (err || !exists) {
+      _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
+      return res.status(500).json({
+        error: 'ERROR_PERFORMING_FILE_LOOKUP'
+      });
+    }
+
+    if (page.contentType === 'markdown') {
+      page.compiledContent = marked(page.content);
+    } else {
+      _handleError(null, 'ERROR_UNSUPPORTED_CONTENT_TYPE');
       return res.send(500);
     }
 
-    if (files.indexOf(sha1(req.params.title) + '.json') === -1) {
-      _handleError(err, 'ERROR_PAGE_DOES_NOT_EXIST');
-      return res.status(500).json({
-        error: 'ERROR_PAGE_DOES_NOT_EXIST'
-      });
-    } else {
-      var page = {
-        readableTitle: req.body.title,
-        content: req.body.content,
-        contentType: req.body.contentType || 'markdown',
-        title: _normalizePageTitle(req.body.readableTitle),
-        updated: new Date()
-      };
+    var filePath = _getPageFilePath(req.simpleWiki.pagePath, page.title);
 
-      if (page.contentType === 'markdown') {
-        page.compiledContent = marked(page.content);
-      } else {
-        _handleError('ERROR_UNSUPPORTED_CONTENT_TYPE');
-        return res.send(500);
+    _readPage(filePath, function (err, data) {
+      if (err) {
+        return res.send(500).json({
+          error: 'ERROR_READING_FROM_PAGE'
+        });
       }
 
-      var filePath = _getPageFilePath(req.simpleWiki.pagePath, page.title);
+      data = JSON.parse(data);
+      data = _.merge(data, page);
 
-      fs.readFile(filePath, 'utf8', function (err, data) {
+      _writePage(filePath, JSON.stringify(data), function (err, success) {
         if (err) {
-          _handleError(err, 'ERROR_READING_PAGE');
-          return res.send(500);
+          return res.status(500).json({
+            error: err
+          });
         }
 
-        data = JSON.parse(data);
-        data = _.merge(data, page);
-
-        fs.writeFile(filePath, JSON.stringify(data), 'utf-8', function (err) {
-          if (err) {
-            _handleError(err, 'ERROR_UPDATING_PAGE');
-            res.send(500);
-          } else {
-            res.send(data);
-          }
-        });
+        return res.status(200).json(data);
       });
-    }
+
+    });
   });
 }
 
 /*
  * Private API
  */
+
+function _buildFileName(title, fileType) {
+  fileType = fileType || '.json';
+  return sha1(_normalizePageTitle(title)) + fileType;
+}
 
 function _getPageFilePath(base, name, fileType) {
   fileType = fileType || 'json';
@@ -176,8 +180,43 @@ function _handleError(error, message) {
   }
 }
 
+function _pageExists(path, name, callback) {
+  fs.readdir(path, function (err, files) {
+    if (err) {
+      return callback(err, null);
+    }
+
+    if (files.indexOf(sha1(name) + '.json') >= 0) {
+      return callback(null, true);
+    }
+
+    return callback(null, false);
+  })
+}
+
 function _normalizePageTitle(title) {
   return title
     .toLowerCase()
     .replace(/ /g, '_');
+}
+
+function _readPage(file, callback) {
+  fs.readFile(file, 'utf-8', function (err, data) {
+    if (err) {
+      _handleError(err, 'ERROR_READING_FROM_PAGE');
+      return callback('ERROR_READING_FROM_PAGE', false);
+    }
+
+    return callback(null, data);
+  });
+}
+
+function _writePage(file, data, callback) {
+  fs.writeFile(file, data, 'utf-8', function (err) {
+    if (err) {
+      _handleError(err, 'ERROR_WRITING_PAGE');
+      return callback('ERROR_WRITING_PAGE', false);
+    }
+    return callback(null, true);
+  });
 }

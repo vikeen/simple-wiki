@@ -5,6 +5,8 @@ angular.module('simpleWikiApp')
     var vm = this;
 
     vm.newPage = {
+      //title: 'asasd',
+      //content: 'GMGMGMG',
       contentType: 'markdown'
     };
 
