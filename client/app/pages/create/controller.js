@@ -4,7 +4,13 @@ angular.module('simpleWikiApp')
   .controller('PageCreateController', function ($scope, $http) {
     var vm = this;
 
-    vm.newPage = {};
+    vm.newPage = {
+      contentType: 'markdown'
+    };
+
+    vm.contentTypes = {
+      markdown: 'Markdown'
+    };
 
     vm.onSubmit = onSubmit;
 

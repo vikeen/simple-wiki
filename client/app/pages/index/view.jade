@@ -1,12 +1,12 @@
 div(ng-include='"components/navbar/navbar.html"')
 
 .container
+  h1.headline Recent Articles
   .row
-    .col-lg-12
-      h1.page-header Pages:
-  .row
-    .page.col-lg-12(ng-repeat='page in pagesCtrl.pages')
+    .page.col-lg-12(ng-repeat='page in pagesCtrl.pages | limitTo:pagesCtrl.viewingLimit')
       .title
-        a(href='#', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
+        a(ui-sref='pages:show({title: page.title})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
       .created {{page.created}}
-      .content(ng-bind-html='page.content')
+      .content(ng-bind-html='page.compiledContent')
+
+    md-button.md-raised.md-primary(ng-hide='!pagesCtrl.pages.length.length || pagesCtrl.pages.length <= pagesCtrl.viewingLimit' ng-click='pagesCtrl.incrementViewingLimit()') Show More

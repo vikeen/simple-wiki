@@ -1,0 +1,37 @@
+div(ng-include='"components/navbar/navbar.html"')
+
+.container
+  md-content(layout='row' hide-md hide-sm)
+    form.md-padding(flex='50' name='pageUpdateForm' novalidate)
+      legend Edit Page
+      fieldset
+        .form-group
+          label.control-label(for='readableTitle') Title
+          input.form-control(ng-model='pageUpdateCtrl.page.readableTitle' id='readableTitle' name='readableTitle' required)
+        .form-group
+          label.control-label(for='content') Content
+            select(ng-model='pageUpdateCtrl.page.contentType' ng-options='key as value for (key, value) in pageUpdateCtrl.contentTypes')
+          textarea.form-control(ng-model='pageUpdateCtrl.page.content' id='content' name='content' rows='24' required)
+    form.md-padding(flex='50')
+      legend Preview
+      h1.headline {{pageUpdateCtrl.page.readableTitle}}
+      div(ng-bind-html='pageUpdateCtrl.page.content | markdown')
+  md-content.md-padding(hide-gt-md)
+    md-tabs(md-dynamic-height md-border-bottom)
+      md-tab(label='write')
+        md-content.md-padding
+          form(name='pageUpdateForm' ng-submit='pageUpdateCtrl.onSubmit(pageUpdateForm)' novalidate)
+            fieldset
+              .form-group
+                label.control-label(for='readableTitle') Title
+                input.form-control(ng-model='pageUpdateCtrl.page.readableTitle' id='readableTitle' name='readableTitle' required)
+              .form-group
+                label.control-label(for='content') Content
+                  select(ng-model='pageUpdateCtrl.page.contentType' ng-options='key as value for (key, value) in pageUpdateCtrl.contentTypes')
+                textarea.form-control(ng-model='pageUpdateCtrl.page.content' id='content' name='content' rows='24' required)
+      md-tab(label='preview' ng-disabled='!pageUpdateCtrl.page.content')
+        h1.headline {{pageUpdateCtrl.page.readableTitle}}
+        md-content.md-padding(ng-bind-html='pageUpdateCtrl.page.content | markdown')
+
+  .control-group
+    md-button.md-raised.md-primary(ng-click='pageUpdateCtrl.onSubmit(pageUpdateForm)') Submit

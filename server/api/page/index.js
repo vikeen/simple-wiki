@@ -10,4 +10,6 @@ router.get('/:title', controller.show);
 
 router.post('/', controller.create);
 
+router.put('/:title', controller.update);
+
 module.exports = router;

@@ -9,7 +9,8 @@ var _ = require('lodash'),
 module.exports = {
   create: create,
   index: index,
-  show: show
+  show: show,
+  update: update
 };
 
 /*
@@ -20,12 +21,20 @@ function create(req, res) {
   var page = {
     readableTitle: req.body.title,
     content: req.body.content,
+    contentType: req.body.contentType || 'markdown',
     title: req.body.title.toLowerCase(),
     created: new Date(),
     updated: null
   };
 
   page.title = _normalizePageTitle(page.title);
+
+  if (page.contentType === 'markdown') {
+    page.compiledContent = marked(page.content);
+  } else {
+    _handleError('ERROR_UNSUPPORTED_CONTENT_TYPE');
+    return res.send(500);
+  }
 
   fs.readdir(req.simpleWiki.pagePath, function (err, files) {
     if (err) {
@@ -72,7 +81,8 @@ function index(req, res) {
           return res.send(500);
         }
 
-        ret.push(_normalizePageJson(data));
+
+        ret.push(JSON.parse(data));
 
         if (0 === --count) {
           return res.json(ret);
@@ -89,7 +99,61 @@ function show(req, res) {
       return res.send(500);
     }
 
-    return res.send(_normalizePageJson(data));
+    data = JSON.parse(data);
+    data.compiledContent = marked(data.content);
+    return res.send(data);
+  });
+}
+
+function update(req, res) {
+  fs.readdir(req.simpleWiki.pagePath, function (err, files) {
+    if (err) {
+      _handleError(err, 'ERROR_PAGE_DIRECTORY');
+      return res.send(500);
+    }
+
+    if (files.indexOf(sha1(req.params.title) + '.json') === -1) {
+      _handleError(err, 'ERROR_PAGE_DOES_NOT_EXIST');
+      return res.status(500).json({
+        error: 'ERROR_PAGE_DOES_NOT_EXIST'
+      });
+    } else {
+      var page = {
+        readableTitle: req.body.title,
+        content: req.body.content,
+        contentType: req.body.contentType || 'markdown',
+        title: _normalizePageTitle(req.body.readableTitle),
+        updated: new Date()
+      };
+
+      if (page.contentType === 'markdown') {
+        page.compiledContent = marked(page.content);
+      } else {
+        _handleError('ERROR_UNSUPPORTED_CONTENT_TYPE');
+        return res.send(500);
+      }
+
+      var filePath = _getPageFilePath(req.simpleWiki.pagePath, page.title);
+
+      fs.readFile(filePath, 'utf8', function (err, data) {
+        if (err) {
+          _handleError(err, 'ERROR_READING_PAGE');
+          return res.send(500);
+        }
+
+        data = JSON.parse(data);
+        data = _.merge(data, page);
+
+        fs.writeFile(filePath, JSON.stringify(data), 'utf-8', function (err) {
+          if (err) {
+            _handleError(err, 'ERROR_UPDATING_PAGE');
+            res.send(500);
+          } else {
+            res.send(data);
+          }
+        });
+      });
+    }
   });
 }
 
@@ -110,12 +174,6 @@ function _handleError(error, message) {
   if (error) {
     console.error(error);
   }
-}
-
-function _normalizePageJson(json) {
-  json = JSON.parse(json);
-  json.content = marked(json.content);
-  return json
 }
 
 function _normalizePageTitle(title) {
