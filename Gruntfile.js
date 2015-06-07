@@ -1,13 +1,6 @@
 'use strict';
 
 module.exports = function (grunt) {
-  var localConfig;
-  try {
-    localConfig = require('./server/config/local.env');
-  } catch (e) {
-    localConfig = {};
-  }
-
   // Load grunt tasks automatically, when needed
   require('jit-grunt')(grunt, {
     express: 'grunt-express-server',
@@ -423,8 +416,7 @@ module.exports = function (grunt) {
       },
       prod: {
         NODE_ENV: 'production'
-      },
-      all: localConfig
+      }
     },
 
     // Compiles Jade to html
