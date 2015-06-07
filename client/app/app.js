@@ -2,6 +2,7 @@
 
 angular.module('simpleWikiApp', [
   'ngCookies',
+  'ngMaterial',
   'ngResource',
   'ngSanitize',
   'ui.router',

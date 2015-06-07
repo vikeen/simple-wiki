@@ -1,12 +1,10 @@
 'use strict';
 
 angular.module('simpleWikiApp')
-  .controller('PageCreateController', function ($http) {
+  .controller('PageCreateController', function ($scope, $http) {
     var vm = this;
 
-    vm.newPage = {
-
-    };
+    vm.newPage = {};
 
     vm.onSubmit = onSubmit;
 

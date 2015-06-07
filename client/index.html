@@ -12,11 +12,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <base href="/">
   <title>Simple Wiki</title>
-  <meta name="description" content="">
+  <meta name="description" content="Simple, lightweight Wiki for Nodejs">
   <meta name="viewport" content="width=device-width">
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   <!-- build:css(client) app/vendor.css -->
   <!-- bower:css -->
+  <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css({.tmp,client}) app/app.css -->
@@ -24,6 +25,7 @@
   <!-- injector:css -->
   <!-- endinjector -->
   <!-- endbuild -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body ng-app="simpleWikiApp">
 <!-- Add your site or application content here -->
@@ -44,6 +46,10 @@
 <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 <script src="bower_components/lodash/dist/lodash.compat.js"></script>
 <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/angular-aria/angular-aria.js"></script>
+<script src="bower_components/angular-material/angular-material.js"></script>
+<script src="bower_components/marked/lib/marked.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
@@ -55,6 +61,7 @@
 <script src="app/pages/create/controller.js"></script>
 <script src="app/pages/index.js"></script>
 <script src="app/pages/index/controller.js"></script>
+<script src="components/markdown/markdown.filter.js"></script>
 <script src="components/modal/modal.service.js"></script>
 <script src="components/navbar/navbar.controller.js"></script>
 <!-- endinjector -->

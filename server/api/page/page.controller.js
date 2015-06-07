@@ -33,7 +33,7 @@ function create(req, res) {
       return res.send(500);
     }
 
-    if (files.indexOf(sha1('herpa_derpa') + '.json') >= 0) {
+    if (files.indexOf(sha1(page.title) + '.json') >= 0) {
       _handleError(err, 'ERROR_PAGE_ALREADY_EXISTS');
       return res.status(500).json({
         error: 'ERROR_PAGE_ALREADY_EXISTS'
