@@ -6,7 +6,7 @@ var controller = require('./page.controller.js');
 var router = express.Router();
 
 router.get('/', controller.index);
-router.get('/:name', controller.show);
+router.get('/:title', controller.show);
 
 router.post('/', controller.create);
 

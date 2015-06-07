@@ -7,19 +7,3 @@ header#banner.hero-unit
     img(src='assets/images/yeoman.png', alt='I\'m Yeoman')
 
 .container
-  .row
-    .col-lg-12
-      h1.page-header Features:
-      ul.nav.nav-tabs.nav-stacked.col-md-4.col-lg-4.col-sm-6(ng-repeat='page in awesomeThings')
-        li
-          a(href='#', tooltip='{{page.info}}')
-            | {{page.name}}
-
-footer.footer
-  .container
-    p
-      | Angular Fullstack v2.0.13
-      = ' | '
-      a(href='https://twitter.com/tyhenkel') @tyhenkel
-      = ' | '
-      a(href='https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open') Issues

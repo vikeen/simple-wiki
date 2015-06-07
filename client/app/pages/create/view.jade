@@ -1,0 +1,19 @@
+div(ng-include='"components/navbar/navbar.html"')
+
+.container
+  .row
+    .col-lg-12
+      form(name='pageCreateForm' ng-submit='pageCreateCtrl.onSubmit(pageCreateForm)' novalidate)
+        legend Create Page
+        fieldset
+          .form-group
+            label.control-label(for='title') Title
+            input.form-control(ng-model='pageCreateCtrl.newPage.title' id='title' name='title' required)
+
+
+          .form-group
+            label.control-label(for='content') Content
+            textarea.form-control(ng-model='pageCreateCtrl.newPage.content' id='content' name='content' rows='24' required)
+
+          .control-group
+            button.btn.btn-default(type='submit') Submit

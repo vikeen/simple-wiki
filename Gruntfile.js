@@ -106,7 +106,7 @@ module.exports = function (grunt) {
       },
       express: {
         files: [
-          'server/**/*.{js,json}'
+          'server/**/*.js'
         ],
         tasks: ['express:dev', 'wait'],
         options: {
@@ -460,7 +460,7 @@ module.exports = function (grunt) {
         files: {
           '.tmp/app/app.css': '<%= yeoman.client %>/app/app.less'
         }
-      },
+      }
     },
 
     injector: {

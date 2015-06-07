@@ -6,9 +6,13 @@ div.navbar.navbar-default.navbar-static-top(ng-controller='NavbarCtrl')
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand(href='/') simple-wiki
+      a.navbar-brand(href='/') Simple Wiki
 
     div#navbar-main.navbar-collapse.collapse(collapse='isCollapsed')
       ul.nav.navbar-nav
-        li(ng-repeat='item in menu', ng-class='{active: isActive(item.link)}')
-          a(ng-href='{{item.link}}') {{item.title}}
+        li
+          a(ui-sref='main') Home
+        li
+          a(ui-sref='pages:index') All Pages
+        li
+          a(ui-sref='pages:create') Create Page

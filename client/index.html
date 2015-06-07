@@ -28,6 +28,7 @@
 <body ng-app="simpleWikiApp">
 <!-- Add your site or application content here -->
 <div ui-view=""></div>
+<div ng-include="'components/footer/footer.html'"></div>
 
 <!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -51,8 +52,9 @@
 <!-- injector:js -->
 <script src="app/main/main.controller.js"></script>
 <script src="app/main/main.js"></script>
-<script src="app/pages/pages.controller.js"></script>
-<script src="app/pages/pages.js"></script>
+<script src="app/pages/create/controller.js"></script>
+<script src="app/pages/index.js"></script>
+<script src="app/pages/index/controller.js"></script>
 <script src="components/modal/modal.service.js"></script>
 <script src="components/navbar/navbar.controller.js"></script>
 <!-- endinjector -->
