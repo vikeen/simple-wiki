@@ -535,13 +535,12 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
-      return grunt.task.run(['build', 'env:all', 'env:prod', 'express:prod', 'wait', 'open', 'express-keepalive']);
+      return grunt.task.run(['build', 'env:prod', 'express:prod', 'wait', 'open', 'express-keepalive']);
     }
 
     if (target === 'debug') {
       return grunt.task.run([
         'clean:server',
-        'env:all',
         'injector:less',
         'concurrent:server',
         'injector',
@@ -553,7 +552,6 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
-      'env:all',
       'injector:less',
       'concurrent:server',
       'injector',
@@ -573,7 +571,6 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', function (target) {
     return grunt.task.run([
-      'env:all',
       'env:test',
       'mochaTest'
     ]);
