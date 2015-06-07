@@ -51,7 +51,7 @@ function create(req, res) {
       });
     }
 
-    var filePath = _getPageFilePath(req.simpleWiki.pagePath, page.title);
+    var filePath = _buildFilePath(req.simpleWiki.pagePath, page.title);
     _writePage(filePath, JSON.stringify(page), function (err, success) {
       if (err) {
         return res.status(500).json({
@@ -94,7 +94,7 @@ function index(req, res) {
 }
 
 function show(req, res) {
-  fs.readFile(_getPageFilePath(req.simpleWiki.pagePath, _normalizePageTitle(req.params.title)), 'utf8', function (err, data) {
+  fs.readFile(_buildFilePath(req.simpleWiki.pagePath, _normalizePageTitle(req.params.title)), 'utf8', function (err, data) {
     if (err) {
       _handleError(err, 'ERROR_PAGE');
       return res.send(500);
@@ -130,7 +130,7 @@ function update(req, res) {
       return res.send(500);
     }
 
-    var filePath = _getPageFilePath(req.simpleWiki.pagePath, page.title);
+    var filePath = _buildFilePath(req.simpleWiki.pagePath, page.title);
 
     _readPage(filePath, function (err, data) {
       if (err) {
@@ -165,10 +165,9 @@ function _buildFileName(title, fileType) {
   return sha1(_normalizePageTitle(title)) + fileType;
 }
 
-function _getPageFilePath(base, name, fileType) {
+function _buildFilePath(base, name, fileType) {
   fileType = fileType || 'json';
-  var fileName = sha1(name) + '.' + fileType;
-  return path.join(base, fileName);
+  return path.join(base, _buildFileName(name));
 }
 
 function _handleError(error, message) {
