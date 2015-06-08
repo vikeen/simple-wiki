@@ -15,22 +15,58 @@
 var path = require('path'),
     simpleWiki = require('simple-wiki');
 
+// required for page storage
 simpleWiki.pagePath = path.join(__dirname, 'pages');
-simpleWiki.server.start(); // port:9000 ip:127.0.0.1
+
+// port - 9000
+// ip   - 127.0.0.1 (http://localhost)
+simpleWiki.server.start(); 
 ```
 
 ## Configuration
 
+@TODO
+
 ## FAQ
 
-Q. Is this normal?
+Q. **I found a bug. Where should I log it?**
 
-A. Yes. This is normal. Why ...
+A. You can log issues [here](https://github.com/vikeen/simple-wiki/issues). Please do us a favor and search before creating a new ticket to reduce duplicate overhead.
+
+
+Q. **What can I expect in the future?**
+
+A. Tons of things! Here is a sneak peak of the roadmap.
+ - Page versioning via git
+ - Custom page templates
+ - Custom css themes
+ - Enhanced document content types
+ - Embedded table of contents
+ - Internal autocomplete links
+ - Other storage mechanisms (considering database here)
 
 ## Development
 
-grunt stuff
+**Fork and clone the source locally**
+- fork and clone the source
+ - `git clone forked_simple-wiki`
+- Install depencies
+ - `npm install && bower install`
+- Get going!
+ - `grunt serve`
+
+**Integrate as a third party user**
+- Create sandbox project
+ - `mkdir simple-wiki-sandbox && cd $_`
+- Create init node_modules.
+ - `mkdir node_modules`
+- Create the server file to start simple-wiki.
+ - `touch app.js`. The contents of this file should look similar to the [usage](#Usage) instructions above.
+- Link the sandbox to our source code.
+ - `ln -sf ../simple-wiki node_modules`
+
+This will connect a development instance of simple-wiki to a user's production product. Because this is being connected via a node_module `require` it will also internally user the `dist/` of simple-wiki. This means that any change you make to the simple-wiki source will require a `grunt build` to see it in the sandbox area.
 
 ##Maintainers
 
-me
+[vikeen](https://github.com/vikeen)
