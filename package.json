@@ -1,6 +1,6 @@
 {
   "name": "simple-wiki",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Simple file system based wiki for Nodejs",
   "repository": {
     "type": "git",

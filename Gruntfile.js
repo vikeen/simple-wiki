@@ -544,6 +544,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('server', function () {
     var simpleWiki = require('./index');
+    grunt.task.run(['wait', 'express-keepalive']);
     simpleWiki.server.start();
   });
 

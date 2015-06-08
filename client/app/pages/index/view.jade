@@ -9,4 +9,4 @@ div(ng-include='"components/navbar/navbar.html"')
       .created {{page.created}}
       .content(ng-bind-html='page.compiledContent')
 
-    md-button.md-raised.md-primary(ng-hide='!pagesCtrl.pages.length.length || pagesCtrl.pages.length <= pagesCtrl.viewingLimit' ng-click='pagesCtrl.incrementViewingLimit()') Show More
+    md-button.md-raised.md-primary(ng-hide='!pagesCtrl.pages.length || pagesCtrl.pages.length <= pagesCtrl.viewingLimit' ng-click='pagesCtrl.incrementViewingLimit()') Show More
