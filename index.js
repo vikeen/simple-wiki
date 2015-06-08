@@ -1,4 +1,4 @@
-var config = require('./server/config/environment');
+var config = require('./config');
 
 var simpleWikiConfig = {
   server: {

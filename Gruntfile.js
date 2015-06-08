@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function (grunt) {
-  var config = require('./server/config/environment');
+  var config = require('./config');
   // Load grunt tasks automatically, when needed
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
@@ -110,7 +110,8 @@ module.exports = function (grunt) {
             '<%= yeoman.dist %>/*',
             '!<%= yeoman.dist %>/.git*',
             '!<%= yeoman.dist %>/.openshift',
-            '!<%= yeoman.dist %>/Procfile'
+            '!<%= yeoman.dist %>/Procfile',
+            '!<%= yeoman.dist %>/config'
           ]
         }]
       },
