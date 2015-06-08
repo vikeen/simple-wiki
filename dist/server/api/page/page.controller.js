@@ -2,6 +2,7 @@
 
 var _ = require('lodash'),
   marked = require('marked'),
+  Promise = require('bluebird'),
   sha1 = require('node-sha1'),
   fs = require('fs'),
   path = require('path');
@@ -17,141 +18,134 @@ module.exports = {
  * Public API
  */
 
-function create(req, res) {
-  var page = {
-    readableTitle: req.body.title,
-    content: req.body.content,
-    contentType: req.body.contentType || 'markdown',
-    title: req.body.title.toLowerCase(),
-    created: new Date(),
-    updated: null
-  };
+function create(payload, options) {
+  return new Promise(function (resolve, reject) {
+    var page = {
+      readableTitle: payload.title,
+      content: payload.content,
+      contentType: payload.contentType,
+      title: payload.title.toLowerCase(),
+      created: new Date(),
+      updated: null
+    };
 
-  page.title = _normalizePageTitle(page.title);
-
-  if (page.contentType === 'markdown') {
-    page.compiledContent = marked(page.content);
-  } else {
-    _handleError('ERROR_UNSUPPORTED_CONTENT_TYPE');
-    return res.status(500);
-  }
-
-  _pageExists(req.simpleWiki.pagePath, page.title, function (err, exists) {
-    if (err) {
-      _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
-      return res.status(500).json({
-        error: 'ERROR_PERFORMING_FILE_LOOKUP'
-      });
-    }
-
-    if (exists) {
-      _handleError(null, 'ERROR_PAGE_ALREADY_EXISTS');
-      return res.status(500).json({
-        error: 'ERROR_PAGE_ALREADY_EXISTS'
-      });
-    }
-
-    var filePath = _buildFilePath(req.simpleWiki.pagePath, page.title);
-    _writePage(filePath, JSON.stringify(page), function (err, success) {
-      if (err) {
-        return res.status(500).json({
-          error: err
-        });
-      }
-
-      return res.status(200).json(page);
-    });
-  });
-}
-
-function index(req, res) {
-  var ret = [];
-  fs.readdir(req.simpleWiki.pagePath, function (err, files) {
-    if (err) {
-      _handleError(err, 'ERROR_PAGE_DIRECTORY');
-      return res.status(500);
-    }
-
-    var count = 0;
-    files.forEach(function (fileName) {
-      count++;
-
-      _readPage(path.join(req.simpleWiki.pagePath, fileName), function (err, data) {
-        if (err) {
-          return res.send(500).json({
-            error: 'ERROR_READING_FROM_PAGE'
-          });
-        }
-
-        ret.push(JSON.parse(data));
-
-        if (0 === --count) {
-          return res.json(ret);
-        }
-      });
-    });
-  });
-}
-
-function show(req, res) {
-  fs.readFile(_buildFilePath(req.simpleWiki.pagePath, _normalizePageTitle(req.params.title)), 'utf8', function (err, data) {
-    if (err) {
-      _handleError(err, 'ERROR_PAGE');
-      return res.send(500);
-    }
-
-    data = JSON.parse(data);
-    data.compiledContent = marked(data.content);
-    return res.send(data);
-  });
-}
-
-function update(req, res) {
-  var page = {
-    readableTitle: req.body.title,
-    content: req.body.content,
-    contentType: req.body.contentType || 'markdown',
-    title: _normalizePageTitle(req.body.readableTitle),
-    updated: new Date()
-  };
-
-  _pageExists(req.simpleWiki.pagePath, page.title, function (err, exists) {
-    if (err || !exists) {
-      _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
-      return res.status(500).json({
-        error: 'ERROR_PERFORMING_FILE_LOOKUP'
-      });
-    }
+    page.title = _normalizePageTitle(page.title);
 
     if (page.contentType === 'markdown') {
       page.compiledContent = marked(page.content);
     } else {
-      _handleError(null, 'ERROR_UNSUPPORTED_CONTENT_TYPE');
-      return res.send(500);
+      _handleError('ERROR_UNSUPPORTED_CONTENT_TYPE');
+      return reject('ERROR_UNSUPPORTED_CONTENT_TYPE');
     }
 
-    var filePath = _buildFilePath(req.simpleWiki.pagePath, page.title);
-
-    _readPage(filePath, function (err, data) {
+    _pageExists(options.pagePath, page.title, function (err, exists) {
       if (err) {
-        return res.send(500).json({
-          error: 'ERROR_READING_FROM_PAGE'
-        });
+        _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
+        return reject('ERROR_PERFORMING_FILE_LOOKUP');
       }
 
-      data = JSON.parse(data);
-      data = _.merge(data, page);
+      if (exists) {
+        _handleError(null, 'ERROR_PAGE_ALREADY_EXISTS');
+        return reject('ERROR_PAGE_ALREADY_EXISTS');
+      }
 
-      _writePage(filePath, JSON.stringify(data), function (err, success) {
+      var filePath = _buildFilePath(options.pagePath, page.title);
+      _writePage(filePath, JSON.stringify(page), function (err, success) {
         if (err) {
-          return res.status(500).json({
-            error: err
-          });
+          return reject(err);
         }
 
-        return res.status(200).json(data);
+        return resolve(page);
       });
+    });
+  });
+}
 
+function index(options) {
+  return new Promise(function (resolve, reject) {
+    var ret = [];
+    fs.readdir(options.pagePath, function (err, files) {
+      if (err) {
+        _handleError(err, 'ERROR_PERFORMING_PAGE_DIRECTORY_LOOKUP');
+        return reject('ERROR_PERFORMING_PAGE_DIRECTORY_LOOKUP');
+      }
+
+      var count = 0;
+      files.forEach(function (fileName) {
+        count++;
+
+        _readPage(path.join(options.pagePath, fileName), function (err, data) {
+          if (err) {
+            _handleError(err, 'ERROR_READING_FROM_PAGE');
+            return reject('ERROR_READING_FROM_PAGE');
+          }
+
+          ret.push(JSON.parse(data));
+
+          if (0 === --count) {
+            return resolve(ret);
+          }
+        });
+      });
+    });
+  });
+}
+
+function show(title, options) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(_buildFilePath(options.pagePath, _normalizePageTitle(title)), 'utf8', function (err, data) {
+      if (err) {
+        _handleError(err, 'ERROR_READING_FROM_PAGE');
+        return reject('ERROR_READING_FROM_PAGE');
+      }
+
+      return resolve(JSON.parse(data));
+    });
+  });
+}
+
+function update(title, payload, options) {
+  return new Promise(function (resolve, reject) {
+    var page = {
+      readableTitle: payload.readableTitle,
+      content: payload.content,
+      contentType: payload.contentType,
+      title: _normalizePageTitle(payload.readableTitle),
+      updated: new Date()
+    };
+
+    _pageExists(options.pagePath, title, function (err, exists) {
+      if (err || !exists) {
+        _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
+        return reject('ERROR_PERFORMING_FILE_LOOKUP');
+      }
+
+      if (page.contentType === 'markdown') {
+        page.compiledContent = marked(page.content);
+      } else {
+        _handleError(null, 'ERROR_UNSUPPORTED_CONTENT_TYPE');
+        return reject('ERROR_UNSUPPORTED_CONTENT_TYPE');
+      }
+
+      var filePath = _buildFilePath(options.pagePath, title);
+
+      _readPage(filePath, function (err, data) {
+        if (err) {
+          return reject(err);
+        }
+
+        data = JSON.parse(data);
+        data = _.merge(data, page);
+
+        _writePage(filePath, JSON.stringify(data), function (err, success) {
+          if (err) {
+            return reject(err);
+          }
+
+          return resolve(data);
+        });
+
+      });
     });
   });
 }
@@ -171,11 +165,13 @@ function _buildFilePath(base, name, fileType) {
 }
 
 function _handleError(error, message) {
-  if (message) {
-    console.error(message);
-  }
-  if (error) {
-    console.error(error);
+  if (process.env.NODE_ENV !== 'test') {
+    if (message) {
+      console.error(message);
+    }
+    if (error) {
+      console.error(error);
+    }
   }
 }
 
