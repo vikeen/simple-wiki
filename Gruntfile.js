@@ -1,9 +1,9 @@
 'use strict';
 
 module.exports = function (grunt) {
+  var config = require('./server/config/environment');
   // Load grunt tasks automatically, when needed
   require('jit-grunt')(grunt, {
-    express: 'grunt-express-server',
     useminPrepare: 'grunt-usemin',
     ngtemplates: 'grunt-angular-templates',
     cdnify: 'grunt-google-cdn',
@@ -25,25 +25,9 @@ module.exports = function (grunt) {
       client: require('./bower.json').appPath || 'client',
       dist: 'dist'
     },
-    express: {
-      options: {
-        port: process.env.PORT || 9000
-      },
-      dev: {
-        options: {
-          script: 'server/app.js',
-          debug: true
-        }
-      },
-      prod: {
-        options: {
-          script: 'dist/server/app.js'
-        }
-      }
-    },
     open: {
       server: {
-        url: 'http://localhost:<%= express.options.port %>'
+        url: 'http://localhost:' + config.server.port
       }
     },
     watch: {
@@ -95,16 +79,6 @@ module.exports = function (grunt) {
         ],
         options: {
           livereload: true
-        }
-      },
-      express: {
-        files: [
-          'server/**/*.js'
-        ],
-        tasks: ['express:dev', 'wait'],
-        options: {
-          livereload: true,
-          nospawn: true //Without this option specified express won't be reloaded
         }
       }
     },
@@ -536,7 +510,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', function (target) {
     if (target === 'dist') {
-      return grunt.task.run(['build', 'env:prod', 'express:prod', 'wait', 'open', 'express-keepalive']);
+      return grunt.task.run(['build', 'env:prod', 'server', 'wait', 'open', 'express-keepalive']);
     }
 
     if (target === 'debug') {
@@ -558,7 +532,7 @@ module.exports = function (grunt) {
       'injector',
       'wiredep',
       'autoprefixer',
-      'express:dev',
+      'server',
       'wait',
       'open',
       'watch'
@@ -566,8 +540,8 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('server', function () {
-    grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-    grunt.task.run(['serve']);
+    var simpleWiki = require('./index');
+    simpleWiki.server.start();
   });
 
   grunt.registerTask('test', function (target) {
