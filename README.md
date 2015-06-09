@@ -11,7 +11,7 @@
 
 ## Usage
 
-```
+```javascript
 var path = require('path'),
     simpleWiki = require('simple-wiki');
 
