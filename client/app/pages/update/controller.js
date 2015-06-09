@@ -18,7 +18,7 @@ angular.module('simpleWikiApp')
      */
 
     function onSubmit(form) {
-      $http.put('/api/pages/' + vm.page.title, vm.page).success(function(updatePage) {
+      $http.put('/api/pages/' + vm.page.id, vm.page).success(function(updatePage) {
         console.log('page update successful!');
       });
     }
@@ -28,7 +28,7 @@ angular.module('simpleWikiApp')
      */
 
     function activate() {
-      $http.get('/api/pages/' + $stateParams.title).success(function(page) {
+      $http.get('/api/pages/' + $stateParams.id).success(function(page) {
         vm.page = page;
       });
     }

@@ -42,12 +42,12 @@ describe('API Page Controller', function () {
       pageController.create(page, options).then(function (data) {
         data.should.have.property('readableTitle', 'My readable title');
         data.should.have.property('title', 'my_readable_title');
+        data.should.have.property('id');
         data.should.have.property('compiledContent');
         data.should.have.property('created');
         data.should.have.property('updated', null);
 
-
-        var filePath = path.join(helpers.config.test.pages, sha1(data.title) + '.json');
+        var filePath = path.join(helpers.config.test.pages, data.id + '.json');
         fs.readFile(filePath, 'utf-8', function (err, fileData) {
           should.not.exist(err);
           fileData.should.be.equal(JSON.stringify(data));
@@ -73,15 +73,15 @@ describe('API Page Controller', function () {
       });
     });
 
-    it('should fail from a duplicate page', function (done) {
-      pageController.create(page, options).then(function (newPage) {
-        should.exist(newPage);
-        pageController.create(page, options).catch(function (err) {
-          err.should.be.equal('ERROR_PAGE_ALREADY_EXISTS');
-          done();
-        });
-      });
-    });
+    //it('should fail from a duplicate page', function (done) {
+    //  pageController.create(page, options).then(function (newPage) {
+    //    should.exist(newPage);
+    //    pageController.create(page, options).catch(function (err) {
+    //      err.should.be.equal('ERROR_PAGE_ALREADY_EXISTS');
+    //      done();
+    //    });
+    //  });
+    //});
   });
 
   describe('index method', function () {
@@ -108,7 +108,7 @@ describe('API Page Controller', function () {
   describe('show method', function () {
     it('should give back the page', function (done) {
       pageController.create(page, options).then(function (newPage) {
-        pageController.show(newPage.title, options).then(function (data) {
+        pageController.show(newPage.id, options).then(function (data) {
           JSON.stringify(newPage).should.be.equal(JSON.stringify(data));
           data.should.have.property('readableTitle', 'My readable title');
           data.should.have.property('title', 'my_readable_title');
@@ -142,7 +142,7 @@ describe('API Page Controller', function () {
     it('should fail from an invalid content type', function (done) {
       pageController.create(page, options).then(function (newPage) {
         newPage.contentType = 'invalid';
-        pageController.update(newPage.title, newPage, options).catch(function (err) {
+        pageController.update(newPage.id, newPage, options).catch(function (err) {
           err.should.be.equal('ERROR_UNSUPPORTED_CONTENT_TYPE');
           done();
         });
@@ -152,7 +152,7 @@ describe('API Page Controller', function () {
     it('should update a page', function (done) {
       pageController.create(page, options).then(function (newPage) {
         newPage.readableTitle = 'ASD LKJ MVN';
-        pageController.update(newPage.title, newPage, options).then(function (updatedPage) {
+        pageController.update(newPage.id, newPage, options).then(function (updatedPage) {
           updatedPage.should.have.property('readableTitle', 'ASD LKJ MVN');
           updatedPage.should.have.property('title', 'asd_lkj_mvn');
           should.exist(updatedPage.updated);

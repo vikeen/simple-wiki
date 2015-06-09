@@ -16,13 +16,13 @@ angular.module('simpleWikiApp')
         controllerAs: 'pageCreateCtrl'
       })
       .state('pages:show', {
-        url: '/pages/:title',
+        url: '/pages/:id',
         templateUrl: 'app/pages/show/view.html',
         controller: 'PageShowController',
         controllerAs: 'pageShowCtrl'
       })
       .state('pages:update', {
-        url: '/pages/:title/edit',
+        url: '/pages/:id/edit',
         templateUrl: 'app/pages/update/view.html',
         controller: 'PageUpdateController',
         controllerAs: 'pageUpdateCtrl'

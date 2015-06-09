@@ -17,7 +17,7 @@ angular.module('simpleWikiApp')
      */
 
     function activate() {
-      $http.get('/api/pages/' + $stateParams.title).success(function(page) {
+      $http.get('/api/pages/' + $stateParams.id).success(function(page) {
         vm.page = page;
       })
     }

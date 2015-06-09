@@ -4,6 +4,7 @@ var _ = require('lodash'),
   marked = require('marked'),
   Promise = require('bluebird'),
   sha1 = require('node-sha1'),
+  uuid = require('node-uuid'),
   fs = require('fs'),
   path = require('path');
 
@@ -20,16 +21,16 @@ module.exports = {
 
 function create(payload, options) {
   return new Promise(function (resolve, reject) {
+
     var page = {
-      readableTitle: payload.title,
+      readableTitle: payload.readableTitle,
       content: payload.content,
       contentType: payload.contentType,
-      title: payload.title.toLowerCase(),
+      title: _normalizePageTitle(payload.readableTitle),
+      id: uuid.v4(),
       created: new Date(),
       updated: null
     };
-
-    page.title = _normalizePageTitle(page.title);
 
     if (page.contentType === 'markdown') {
       page.compiledContent = marked(page.content);
@@ -38,7 +39,7 @@ function create(payload, options) {
       return reject('ERROR_UNSUPPORTED_CONTENT_TYPE');
     }
 
-    _pageExists(options.pagePath, page.title, function (err, exists) {
+    _pageExists(options.pagePath, page.id, function (err, exists) {
       if (err) {
         _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
         return reject('ERROR_PERFORMING_FILE_LOOKUP');
@@ -49,7 +50,7 @@ function create(payload, options) {
         return reject('ERROR_PAGE_ALREADY_EXISTS');
       }
 
-      var filePath = _buildFilePath(options.pagePath, page.title);
+      var filePath = _buildFilePath(options.pagePath, page.id);
       _writePage(filePath, JSON.stringify(page), function (err, success) {
         if (err) {
           return reject(err);
@@ -91,9 +92,9 @@ function index(options) {
   });
 }
 
-function show(title, options) {
+function show(id, options) {
   return new Promise(function (resolve, reject) {
-    fs.readFile(_buildFilePath(options.pagePath, _normalizePageTitle(title)), 'utf8', function (err, data) {
+    fs.readFile(_buildFilePath(options.pagePath, id), 'utf8', function (err, data) {
       if (err) {
         _handleError(err, 'ERROR_READING_FROM_PAGE');
         return reject('ERROR_READING_FROM_PAGE');
@@ -104,7 +105,7 @@ function show(title, options) {
   });
 }
 
-function update(title, payload, options) {
+function update(id, payload, options) {
   return new Promise(function (resolve, reject) {
     var page = {
       readableTitle: payload.readableTitle,
@@ -114,7 +115,7 @@ function update(title, payload, options) {
       updated: new Date()
     };
 
-    _pageExists(options.pagePath, title, function (err, exists) {
+    _pageExists(options.pagePath, id, function (err, exists) {
       if (err || !exists) {
         _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
         return reject('ERROR_PERFORMING_FILE_LOOKUP');
@@ -127,7 +128,7 @@ function update(title, payload, options) {
         return reject('ERROR_UNSUPPORTED_CONTENT_TYPE');
       }
 
-      var filePath = _buildFilePath(options.pagePath, title);
+      var filePath = _buildFilePath(options.pagePath, id);
 
       _readPage(filePath, function (err, data) {
         if (err) {
@@ -154,14 +155,8 @@ function update(title, payload, options) {
  * Private API
  */
 
-function _buildFileName(title, fileType) {
-  fileType = fileType || '.json';
-  return sha1(_normalizePageTitle(title)) + fileType;
-}
-
-function _buildFilePath(base, name, fileType) {
-  fileType = fileType || 'json';
-  return path.join(base, _buildFileName(name));
+function _buildFilePath(base, id) {
+  return path.join(base, id + '.json' );
 }
 
 function _handleError(error, message) {
@@ -175,13 +170,13 @@ function _handleError(error, message) {
   }
 }
 
-function _pageExists(path, name, callback) {
+function _pageExists(path, id, callback) {
   fs.readdir(path, function (err, files) {
     if (err) {
       return callback(err, null);
     }
 
-    if (files.indexOf(sha1(name) + '.json') >= 0) {
+    if (files.indexOf(id + '.json') >= 0) {
       return callback(null, true);
     }
 

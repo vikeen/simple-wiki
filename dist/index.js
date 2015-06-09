@@ -11,5 +11,7 @@ var simpleWikiConfig = {
 module.exports = simpleWikiConfig;
 
 function start() {
+  simpleWikiConfig.env = 'production';
+  process.env.NODE_ENV = simpleWikiConfig.env;
   require('./server/app')(simpleWikiConfig);
 }

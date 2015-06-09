@@ -114,7 +114,8 @@ module.exports = function (grunt) {
             '!<%= yeoman.dist %>/.git*',
             '!<%= yeoman.dist %>/.openshift',
             '!<%= yeoman.dist %>/Procfile',
-            '!<%= yeoman.dist %>/config'
+            '!<%= yeoman.dist %>/config',
+            '!<%= yeoman.dist %>/index.js'
           ]
         }]
       },
@@ -318,7 +319,6 @@ module.exports = function (grunt) {
           expand: true,
           dest: '<%= yeoman.dist %>',
           src: [
-            'index.js',
             'server/**/*'
           ]
         }]
