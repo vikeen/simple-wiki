@@ -56,17 +56,18 @@ A. Tons of things! Here is a sneak peak of the roadmap.
  - `grunt serve`
 
 **Integrate as a third party user**
+
 - Create sandbox project
- - `mkdir simple-wiki-sandbox && cd $_`
+  - `mkdir simple-wiki-sandbox && cd $_`
 - Create init node_modules.
- - `mkdir node_modules`
+  - `mkdir node_modules`
 - Create the server file to start simple-wiki.
- - `touch app.js`. The contents of this file should look similar to the [usage](#Usage) instructions above.
+  - `touch app.js`. The contents of this file should look similar to the [usage](#Usage) instructions above.
 - Link the sandbox to our source code.
- - `ln -sf ../simple-wiki node_modules`
+  - `ln -sf ../simple-wiki node_modules`
 
 This will connect a development instance of simple-wiki to a user's production product. Because this is being connected via a node_module `require` it will also internally user the `dist/` of simple-wiki. This means that any change you make to the simple-wiki source will require a `grunt build` to see it in the sandbox area.
 
-##Maintainers
+## Maintainers
 
 [vikeen](https://github.com/vikeen)
