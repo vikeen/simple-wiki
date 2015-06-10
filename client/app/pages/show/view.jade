@@ -1,7 +1,18 @@
 div(ng-include='"components/navbar/navbar.html"')
 
-.container
-  h1.md-headline {{pageShowCtrl.page.readableTitle}}
-    a(ui-sref='pages:update({id: pageShowCtrl.page.id})')
-      i.fa.fa-edit
-  md-content(ng-bind-html='pageShowCtrl.page.compiledContent')
+.container.page.page-show
+  .title
+    h1 {{pageShowCtrl.page.readableTitle}}
+    hr
+  .meta
+    dl
+      dt
+        i.fa.fa-pencil
+      dd
+        a(ui-sref='pages:update({id: pageShowCtrl.page.id})') Edit
+      dt
+        i.fa.fa-clock-o
+      dd Last edited on {{pageShowCtrl.page.formattedUpdated || pageShowCtrl.page.formattedCreated}}
+  hr
+  .content
+    md-content(ng-bind-html='pageShowCtrl.page.compiledContent')

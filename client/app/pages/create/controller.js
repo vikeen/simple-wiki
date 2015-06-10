@@ -1,36 +1,36 @@
 'use strict';
 
-angular.module('simpleWikiApp')
-  .controller('PageCreateController', function ($scope, $http) {
-    var vm = this;
+angular.module('simpleWikiApp').controller('PageCreateController', PageCreateController);
 
-    vm.newPage = {
-      contentType: 'markdown'
-    };
+function PageCreateController($http, toast) {
+  var vm = this;
 
-    vm.contentTypes = {
-      markdown: 'Markdown'
-    };
+  vm.newPage = {
+    contentType: 'markdown'
+  };
 
-    vm.onSubmit = onSubmit;
+  vm.onSubmit = onSubmit;
 
-    activate();
+  activate();
 
-    /*
-     * Public API
-     */
+  /*
+   * Public API
+   */
 
-    function onSubmit(form) {
-      if (form.$valid) {
-        $http.post('/api/pages/', vm.newPage).success(function() {
-          console.log('page creation successful!');
-        });
-      }
-    }
+  function onSubmit() {
+    $http.post('/api/pages/', vm.newPage)
+      .success(function () {
+        toast.simple('Page created');
+      })
+      .catch(function () {
+        toast.simple('Failed to create page');
+      });
+  }
 
-    /*
-     * Private API
-     */
+  /*
+   * Private API
+   */
 
-    function activate() {}
-  });
+  function activate() {
+  }
+}

@@ -2,8 +2,33 @@ div(ng-include='"components/navbar/navbar.html"')
 
 header#banner.hero-unit
   .container
-    h1 'Allo, 'Allo!
-    p.lead Kick-start your next web app with Angular Fullstack
-    img(src='assets/images/yeoman.png', alt='I\'m Yeoman')
-
-.container
+    h1.md-display-3 Simple Wiki
+    p.lead Simple file system based wiki for Nodejs
+    .lead-images
+      img(src='assets/images/angular.png', alt='Angular')
+      img(src='assets/images/nodejs.png', alt='Nodejs')
+      img(src='assets/images/yeoman.png', alt='I\'m Yeoman')
+md-content#mainPage
+  .container
+    .row
+      md-content.md-padding.col-md-4
+        h2.md-title
+          i.fa.fa-file-text-o
+          = 'Recent Articles'
+        ol
+          li.md-3-line(ng-repeat='page in mainCtrl.pages | orderBy:"-created" | limitTo:10')
+              a(ui-sref='pages:show({id: page.id})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
+      md-content.md-padding.col-md-4
+        h2.md-title
+          i.fa.fa-link
+          = 'Quick Links'
+        ul
+          li.md-3-line
+            a(ui-sref='pages:create') Create New Page
+      md-content.md-padding.col-md-4
+        h2.md-title
+          i.fa.fa-book
+          = 'Documentation'
+        ul
+          li.md-3-line
+            a(href='https://github.com/vikeen/simple-wiki') Github

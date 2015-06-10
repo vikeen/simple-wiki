@@ -1,24 +1,35 @@
 'use strict';
 
-angular.module('simpleWikiApp')
-  .controller('PageShowController', function ($http, $stateParams) {
-    var vm = this;
+angular.module('simpleWikiApp').controller('PageShowController', PageShowController);
 
-    vm.page = {};
+function PageShowController($http, $stateParams) {
+  var vm = this;
 
-    activate();
+  vm.page = {};
 
-    /*
-     * Public API
-     */
+  activate();
 
-    /*
-     * Private API
-     */
+  /*
+   * Public API
+   */
 
-    function activate() {
-      $http.get('/api/pages/' + $stateParams.id).success(function(page) {
-        vm.page = page;
-      })
-    }
-  });
+  /*
+   * Private API
+   */
+
+  function activate() {
+    $http.get('/api/pages/' + $stateParams.id).success(function (page) {
+      vm.page = page;
+      vm.page.formattedCreated = _convertDate(vm.page.created);
+      vm.page.formattedUpdated = null;
+
+      if (vm.page.updated) {
+        vm.page.formattedUpdated = _convertDate(vm.page.updated);
+      }
+    });
+  }
+
+  function _convertDate(date) {
+    return new Date(date).toLocaleDateString() + ' ' + new Date(date).toLocaleTimeString();
+  }
+}
