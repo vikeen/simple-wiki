@@ -27,9 +27,10 @@
   <!-- endbuild -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body ng-app="simpleWikiApp">
-<!-- Add your site or application content here -->
-<div ui-view=""></div>
+<body ng-app="simpleWikiApp" layout="column">
+<md-content flex="100" id="MainContent">
+  <div ui-view=""></div>
+</md-content>
 <div ng-include="'components/footer/footer.html'"></div>
 
 <!--[if lt IE 9]>
@@ -63,9 +64,12 @@
 <script src="app/pages/index/controller.js"></script>
 <script src="app/pages/show/controller.js"></script>
 <script src="app/pages/update/controller.js"></script>
+<script src="components/content-previewer/content-previewer.controller.js"></script>
+<script src="components/content-previewer/content-previewer.directive.js"></script>
 <script src="components/markdown/markdown.filter.js"></script>
 <script src="components/modal/modal.service.js"></script>
 <script src="components/navbar/navbar.controller.js"></script>
+<script src="components/toast/toast.service.js"></script>
 <!-- endinjector -->
 <!-- endbuild -->
 </body>

@@ -1,0 +1,45 @@
+.content-previewer
+  md-content(layout='row' hide-md hide-sm)
+    form.md-padding(flex='50' ng-submit='contentPreviewerCtrl.onSubmit(contentPreviewerForm)')
+      legend.md-headline {{contentPreviewerCtrl.swTitle}}
+      fieldset
+        .form-group
+          label.control-label(for='readableTitle') Title
+          input.form-control(ng-model='contentPreviewerCtrl.swModel.readableTitle' id='readableTitle' name='readableTitle' required)
+        .form-group
+          .row
+            .col-sm-6
+              label.control-label(for='content' style='margin-top: 8px') Content
+            .col-sm-6
+              select.form-control(
+                ng-model='contentPreviewerCtrl.swModel.contentType'
+                ng-options='key as value for (key, value) in contentPreviewerCtrl.contentTypes')
+        .form-group
+          textarea.form-control(ng-model='contentPreviewerCtrl.swModel.content' id='content' name='content' rows='23' required)
+    form.md-padding(flex='50')
+      legend.md-headline Preview
+      md-content.preview
+        h1(ng-if='contentPreviewerCtrl.swModel.readableTitle.length') {{contentPreviewerCtrl.swModel.readableTitle}}
+        hr
+        md-content(ng-bind-html='contentPreviewerCtrl.swModel.content | markdown')
+  md-content.md-padding(hide-gt-md)
+    md-tabs(md-dynamic-height md-border-bottom)
+      md-tab(label='write')
+        md-content.md-padding.p-r-0.p-l-0
+          form(name='contentPreviewerForm' ng-submit='contentPreviewerCtrl.onSubmit(contentPreviewerForm)')
+            fieldset
+              .form-group
+                label.control-label(for='readableTitle') Title
+                input.form-control(ng-model='contentPreviewerCtrl.swModel.readableTitle' id='readableTitle' name='readableTitle' required)
+              .form-group
+                label.control-label(for='content') Content
+                  select(ng-model='contentPreviewerCtrl.swModel.contentType' ng-options='key as value for (key, value) in contentPreviewerCtrl.contentTypes')
+                textarea.form-control(ng-model='contentPreviewerCtrl.swModel.content' id='content' name='content' rows='23' required)
+      md-tab(label='preview' ng-disabled='!contentPreviewerCtrl.swModel.content')
+        md-content.md-padding.p-r-0.p-l-0.preview
+          h1(ng-if='contentPreviewerCtrl.swModel.readableTitle.length') {{contentPreviewerCtrl.swModel.readableTitle}}
+          hr
+          md-content(ng-bind-html='contentPreviewerCtrl.swModel.content | markdown')
+
+  .control-group
+    md-button.md-raised.md-primary(ng-click='contentPreviewerCtrl.onSubmit(contentPreviewerForm)') {{contentPreviewerCtrl.swSubmitText}}

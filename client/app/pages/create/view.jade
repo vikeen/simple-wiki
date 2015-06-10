@@ -1,37 +1,8 @@
 div(ng-include='"components/navbar/navbar.html"')
 
 .container
-  md-content(layout='row' hide-md hide-sm)
-    form.md-padding(flex='50' name='pageCreateForm' novalidate)
-      legend Create Page
-      fieldset
-        .form-group
-          label.control-label(for='readableTitle') Title
-          input.form-control(ng-model='pageCreateCtrl.newPage.readableTitle' id='readableTitle' name='readableTitle' required)
-        .form-group
-          label.control-label(for='content') Content
-            select(ng-model='pageCreateCtrl.newPage.contentType' ng-options='key as value for (key, value) in pageCreateCtrl.contentTypes')
-          textarea.form-control(ng-model='pageCreateCtrl.newPage.content' id='content' name='content' rows='24' required)
-    form.md-padding(flex='50')
-      legend Preview
-      h1.headline {{pageCreateCtrl.newPage.readableTitle}}
-      md-content(ng-bind-html='pageCreateCtrl.newPage.content | markdown')
-  md-content.md-padding(hide-gt-md)
-    md-tabs(md-dynamic-height md-border-bottom)
-      md-tab(label='write')
-        md-content.md-padding
-          form(name='pageCreateForm' ng-submit='pageCreateCtrl.onSubmit(pageCreateForm)' novalidate)
-            fieldset
-              .form-group
-                label.control-label(for='readableTitle') Title
-                input.form-control(ng-model='pageCreateCtrl.newPage.readableTitle' id='readableTitle' name='readableTitle' required)
-              .form-group
-                label.control-label(for='content') Content
-                  select(ng-model='pageCreateCtrl.newPage.contentType' ng-options='key as value for (key, value) in pageCreateCtrl.contentTypes')
-                textarea.form-control(ng-model='pageCreateCtrl.newPage.content' id='content' name='content' rows='24' required)
-      md-tab(label='preview' ng-disabled='!pageCreateCtrl.newPage.content')
-        h1.headline {{pageCreateCtrl.newPage.readableTitle}}
-        md-content(ng-bind-html='pageCreateCtrl.newPage.content | markdown')
-
-  .control-group
-    md-button.md-raised.md-primary(ng-click='pageCreateCtrl.onSubmit(pageCreateForm)') Submit
+  sw-content-previewer(
+    sw-title='Create Page'
+    sw-model='pageCreateCtrl.newPage'
+    sw-submit-text='Submit'
+    sw-on-submit='pageCreateCtrl.onSubmit')

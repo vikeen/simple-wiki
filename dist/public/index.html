@@ -16,12 +16,13 @@
   <meta name="viewport" content="width=device-width">
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   <link rel="stylesheet" href="app/3638dbad.vendor.css"/>
-  <link rel="stylesheet" href="app/9bdc6c12.app.css"/>
+  <link rel="stylesheet" href="app/e8adc912.app.css"/>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body ng-app="simpleWikiApp">
-<!-- Add your site or application content here -->
-<div ui-view=""></div>
+<body ng-app="simpleWikiApp" layout="column">
+<md-content flex="100" id="MainContent">
+  <div ui-view=""></div>
+</md-content>
 <div ng-include="'components/footer/footer.html'"></div>
 
 <!--[if lt IE 9]>
@@ -30,6 +31,6 @@
 <![endif]-->
 <script src="app/109ed5a0.vendor.js"></script>
 
-<script src="app/1a2e3215.app.js"></script>
+<script src="app/cba1adfe.app.js"></script>
 </body>
 </html>

@@ -1,35 +1,41 @@
 'use strict';
 
-angular.module('simpleWikiApp')
-  .controller('PageUpdateController', function ($http, $stateParams) {
-    var vm = this;
+angular.module('simpleWikiApp').controller('PageUpdateController', PageUpdateController);
 
-    vm.contentTypes = {
-      markdown: 'Markdown'
-    };
-    vm.page = {};
+function PageUpdateController($http, $stateParams, toast) {
+  var vm = this;
 
-    vm.onSubmit = onSubmit;
+  vm.contentTypes = {
+    markdown: 'Markdown'
+  };
+  vm.page = {};
 
-    activate();
+  vm.onSubmit = onSubmit;
 
-    /*
-     * Public API
-     */
+  activate();
 
-    function onSubmit(form) {
-      $http.put('/api/pages/' + vm.page.id, vm.page).success(function(updatePage) {
-        console.log('page update successful!');
+  /*
+   * Public API
+   */
+
+  function onSubmit() {
+    $http.put('/api/pages/' + vm.page.id, vm.page)
+      .success(function () {
+        toast.simple('Update successful');
+      })
+      .catch(function() {
+        toast.simple('Update failed');
       });
-    }
+  }
 
-    /*
-     * Private API
-     */
+  /*
+   * Private API
+   */
 
-    function activate() {
-      $http.get('/api/pages/' + $stateParams.id).success(function(page) {
+  function activate() {
+    $http.get('/api/pages/' + $stateParams.id)
+      .success(function (page) {
         vm.page = page;
       });
-    }
-  });
+  }
+}
