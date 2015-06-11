@@ -74,5 +74,5 @@ This will connect a development instance of simple-wiki to a user's production p
 
 ## History
 
-1.2.0
+1.2.1
  - Added views meta data to pages. This feature has regression support in the source and test suite so don't worry about anything breaking on an update
