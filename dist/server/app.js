@@ -6,7 +6,7 @@ var _ = require('lodash');
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var express = require('express');
-var config = require('../config')(process.env.NODE_ENV, process.env.NODE_ENV !== 'production');
+var config = require('../config');
 
 // Expose app
 module.exports = function (externalConfig) {

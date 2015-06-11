@@ -3,10 +3,10 @@
 var should = require('should'),
   _ = require('lodash'),
   fs = require('fs'),
+  sha1 = require('node-sha1'),
   path = require('path'),
   testHelpers = require('../../helpers'),
-  config = require('../../../config')('test'),
-  pageController = require(path.join(config.root, 'server/api/page/page.controller'));
+  pageController = require(path.join(testHelpers.config.root, 'server/api/page/page.controller'));
 
 describe('API Page Controller', function () {
   var page = {},
@@ -26,7 +26,7 @@ describe('API Page Controller', function () {
       title: 'My readable title'
     };
     options = {
-      pagePath: config.pagePath
+      pagePath: testHelpers.config.test.pages
     };
     testHelpers.clean(function () {
       done();
@@ -49,7 +49,7 @@ describe('API Page Controller', function () {
         data.should.have.property('created');
         data.should.have.property('updated', null);
 
-        var filePath = path.join(config.pagePath, data.id + '.json');
+        var filePath = path.join(testHelpers.config.test.pages, data.id + '.json');
         fs.readFile(filePath, 'utf-8', function (err, fileData) {
           should.not.exist(err);
           fileData.should.be.equal(JSON.stringify(data));
@@ -110,7 +110,7 @@ describe('API Page Controller', function () {
           delete newPage.views;
           newPage.should.not.have.property('views');
 
-          var filePath = path.join(config.pagePath, newPage.id + '.json');
+          var filePath = path.join(testHelpers.config.test.pages, newPage.id + '.json');
           fs.writeFile(filePath, JSON.stringify(newPage), 'utf-8', function (err) {
             should.not.exist(err);
             pageController.index(options).then(function (pages) {
@@ -170,7 +170,7 @@ describe('API Page Controller', function () {
           delete newPage.views;
           newPage.should.not.have.property('views');
 
-          var filePath = path.join(config.pagePath, newPage.id + '.json');
+          var filePath = path.join(testHelpers.config.test.pages, newPage.id + '.json');
           fs.writeFile(filePath, JSON.stringify(newPage), 'utf-8', function (err) {
             should.not.exist(err);
             pageController.show(newPage.id, options).then(function (shownPage) {

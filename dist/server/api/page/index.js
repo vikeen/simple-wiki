@@ -2,7 +2,7 @@
 
 var express = require('express'),
   controller = require('./page.controller.js'),
-  config = require('../../../config')();
+  config = require('../../../config');
 
 var router = express.Router(),
   options = {
