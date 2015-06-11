@@ -1,6 +1,7 @@
 "use strict";
 
-var config = require('./config'),
+var _ = require('lodash'),
+  config = require('./config'),
   path = require('path'),
   fs = require('fs');
 
@@ -9,7 +10,7 @@ module.exports = function (callback) {
 };
 
 function cleanPages(callback) {
-  fs.readdir(config.test.pages, function(err, files) {
+  fs.readdir(config.test.pages, function (err, files) {
     if (err) {
       console.error(err);
     }
@@ -22,7 +23,7 @@ function cleanPages(callback) {
     files.forEach(function (fileName) {
       count++;
 
-      fs.unlink(path.join(config.test.pages, fileName), function(err) {
+      fs.unlink(path.join(config.test.pages, fileName), function (err) {
         if (err) {
           console.error(err);
         }

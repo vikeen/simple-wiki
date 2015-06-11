@@ -17,3 +17,4 @@ client/bower_components
 # page storage
 server/pages
 dist/server/pages
+test/pages

@@ -29,7 +29,8 @@ function create(payload, options) {
       title: _normalizePageTitle(payload.readableTitle),
       id: uuid.v4(),
       created: new Date(),
-      updated: null
+      updated: null,
+      views: 0
     };
 
     if (page.contentType === 'markdown') {
@@ -81,7 +82,10 @@ function index(options) {
             return reject('ERROR_READING_FROM_PAGE');
           }
 
-          ret.push(JSON.parse(data));
+          data = JSON.parse(data);
+          data.views = data.views || 0;
+
+          ret.push(data);
 
           if (0 === --count) {
             return resolve(ret);
@@ -100,7 +104,17 @@ function show(id, options) {
         return reject('ERROR_READING_FROM_PAGE');
       }
 
-      return resolve(JSON.parse(data));
+      data = JSON.parse(data);
+      data.views = data.views ? data.views += 1 : 1;
+
+      var filePath = _buildFilePath(options.pagePath, id);
+      _writePage(filePath, JSON.stringify(data), function (err, success) {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(data);
+      });
     });
   });
 }
@@ -145,7 +159,6 @@ function update(id, payload, options) {
 
           return resolve(data);
         });
-
       });
     });
   });
@@ -156,7 +169,7 @@ function update(id, payload, options) {
  */
 
 function _buildFilePath(base, id) {
-  return path.join(base, id + '.json' );
+  return path.join(base, id + '.json');
 }
 
 function _handleError(error, message) {

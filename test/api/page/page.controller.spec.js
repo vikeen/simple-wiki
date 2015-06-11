@@ -5,15 +5,17 @@ var should = require('should'),
   fs = require('fs'),
   sha1 = require('node-sha1'),
   path = require('path'),
-  helpers = require('../../helpers'),
-  pageController = require(path.join(helpers.config.root, 'server/api/page/page.controller'));
+  testHelpers = require('../../helpers'),
+  pageController = require(path.join(testHelpers.config.root, 'server/api/page/page.controller'));
 
 describe('API Page Controller', function () {
   var page = {},
     options = {};
 
   before(function (done) {
-    done();
+    testHelpers.init(function() {
+      done();
+    });
   });
 
   beforeEach(function (done) {
@@ -24,15 +26,15 @@ describe('API Page Controller', function () {
       title: 'My readable title'
     };
     options = {
-      pagePath: helpers.config.test.pages
+      pagePath: testHelpers.config.test.pages
     };
-    helpers.clean(function () {
+    testHelpers.clean(function () {
       done();
     });
   });
 
-  after(function (done) {
-    helpers.clean(function () {
+  afterEach(function (done) {
+    testHelpers.clean(function () {
       done();
     });
   });
@@ -47,7 +49,7 @@ describe('API Page Controller', function () {
         data.should.have.property('created');
         data.should.have.property('updated', null);
 
-        var filePath = path.join(helpers.config.test.pages, data.id + '.json');
+        var filePath = path.join(testHelpers.config.test.pages, data.id + '.json');
         fs.readFile(filePath, 'utf-8', function (err, fileData) {
           should.not.exist(err);
           fileData.should.be.equal(JSON.stringify(data));
@@ -73,15 +75,13 @@ describe('API Page Controller', function () {
       });
     });
 
-    //it('should fail from a duplicate page', function (done) {
-    //  pageController.create(page, options).then(function (newPage) {
-    //    should.exist(newPage);
-    //    pageController.create(page, options).catch(function (err) {
-    //      err.should.be.equal('ERROR_PAGE_ALREADY_EXISTS');
-    //      done();
-    //    });
-    //  });
-    //});
+    it('should have a views meta data attribute', function (done) {
+      pageController.create(page, options).then(function (newPage) {
+        newPage.should.have.property('views', 0);
+        done();
+      });
+    });
+
   });
 
   describe('index method', function () {
@@ -103,13 +103,35 @@ describe('API Page Controller', function () {
         done();
       });
     });
+
+    describe('meta data', function () {
+      it('should provide a default view count of 0', function (done) {
+        pageController.create(page, options).then(function (newPage) {
+          delete newPage.views;
+          newPage.should.not.have.property('views');
+
+          var filePath = path.join(testHelpers.config.test.pages, newPage.id + '.json');
+          fs.writeFile(filePath, JSON.stringify(newPage), 'utf-8', function (err) {
+            should.not.exist(err);
+            pageController.index(options).then(function (pages) {
+              pages.should.have.lengthOf(1);
+              pages[0].should.have.property('id', newPage.id);
+              pages[0].should.have.property('views', 0);
+              done();
+            });
+          });
+        });
+      });
+    });
   });
 
   describe('show method', function () {
     it('should give back the page', function (done) {
       pageController.create(page, options).then(function (newPage) {
+        newPage.should.have.property('views', 0);
+
         pageController.show(newPage.id, options).then(function (data) {
-          JSON.stringify(newPage).should.be.equal(JSON.stringify(data));
+          data.should.have.property('id', newPage.id);
           data.should.have.property('readableTitle', 'My readable title');
           data.should.have.property('title', 'my_readable_title');
           done();
@@ -123,6 +145,40 @@ describe('API Page Controller', function () {
         pageController.show(newPage.title, options).catch(function (err) {
           err.should.be.equal('ERROR_READING_FROM_PAGE');
           done();
+        });
+      });
+    });
+
+    describe('meta data', function () {
+      it('should update views', function (done) {
+        pageController.create(page, options).then(function (newPage) {
+          newPage.should.have.property('views', 0);
+          pageController.show(newPage.id, options).then(function (data) {
+            data.should.have.property('id', newPage.id);
+            data.should.have.property('views', 1);
+            pageController.show(newPage.id, options).then(function (data) {
+              data.should.have.property('id', newPage.id);
+              data.should.have.property('views', 2);
+              done();
+            });
+          });
+        });
+      });
+
+      it('should update the views if it does not exist', function (done) {
+        pageController.create(page, options).then(function (newPage) {
+          delete newPage.views;
+          newPage.should.not.have.property('views');
+
+          var filePath = path.join(testHelpers.config.test.pages, newPage.id + '.json');
+          fs.writeFile(filePath, JSON.stringify(newPage), 'utf-8', function (err) {
+            should.not.exist(err);
+            pageController.show(newPage.id, options).then(function (shownPage) {
+              shownPage.should.have.property('id', newPage.id);
+              shownPage.should.have.property('views', 1);
+              done();
+            });
+          });
         });
       });
     });

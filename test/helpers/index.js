@@ -2,5 +2,6 @@
 
 module.exports = {
   config: require('./config'),
-  clean: require('./clean')
+  clean: require('./clean'),
+  init: require('./init')
 };
