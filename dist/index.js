@@ -1,17 +1,37 @@
-var config = require('./config');
+"use strict";
 
-var simpleWikiConfig = {
+var path = require('path');
+var _ = require('lodash');
+
+var config = {
+  // Root path of server
+  root: path.join(__dirname, '..'),
+
+  // Paths
+  faviconPath: undefined,
+  pagePath: undefined, // required for application
+
   server: {
-    ip: config.ip,
-    port: config.port,
+    port: process.env.PORT || 9000,
+    ip: process.env.IP || '127.0.0.1',
     start: start
-  }
+  },
+
+  info: info
 };
 
-module.exports = simpleWikiConfig;
+module.exports = config;
 
 function start() {
-  simpleWikiConfig.env = 'production';
-  process.env.NODE_ENV = simpleWikiConfig.env;
-  require('./server/app')(simpleWikiConfig);
+  if (!config.pagePath) {
+    throw 'Missing required confiuration: pagePath';
+  }
+
+  config.env = 'production';
+  process.env.NODE_ENV = config.env;
+  require('./server/app')(config);
+}
+
+function info() {
+  return config;
 }

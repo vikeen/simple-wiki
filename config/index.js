@@ -23,12 +23,24 @@ var all = {
     port: process.env.PORT || 9000,
 
     // Server ip
-    ip: process.env.IP | '127.0.0.1'
+    ip: process.env.IP || '127.0.0.1'
   }
 };
 
 // Export the config object based on the NODE_ENV
 // ==============================================
-module.exports = _.merge(
-  all,
-  require('./environment/' + process.env.NODE_ENV + '.js') || {});
+module.exports = function (env, logging) {
+  env = env || process.env.NODE_ENV;
+
+  var config = _.merge(
+    all,
+    require('./environment/' + env + '.js') || {});
+
+  if (logging) {
+    console.log('loading config for', env);
+    console.log(config);
+    console.log();
+  }
+
+  return config;
+};
