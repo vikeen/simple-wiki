@@ -32,14 +32,8 @@
                 label.control-label(for='readableTitle') Title
                 input.form-control(ng-model='contentPreviewerCtrl.swModel.readableTitle' id='readableTitle' name='readableTitle' required)
               .form-group
-                .row
-                  .col-sm-6
-                    label.control-label(for='content' style='margin-top: 8px') Content
-                  .col-sm-6
-                    select.form-control(
-                    ng-model='contentPreviewerCtrl.swModel.contentType'
-                    ng-options='key as value for (key, value) in contentPreviewerCtrl.contentTypes')
-              .form-group
+                label.control-label(for='content') Content
+                  select(ng-model='contentPreviewerCtrl.swModel.contentType' ng-options='key as value for (key, value) in contentPreviewerCtrl.contentTypes')
                 textarea.form-control(ng-model='contentPreviewerCtrl.swModel.content' id='content' name='content' rows='23' required)
       md-tab(label='preview' ng-disabled='!contentPreviewerCtrl.swModel.content')
         md-content.md-padding.p-r-0.p-l-0.preview

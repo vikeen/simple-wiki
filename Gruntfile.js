@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function (grunt) {
-  var config = require('./config')();
+  var config = require('./config');
   // Load grunt tasks automatically, when needed
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
@@ -543,9 +543,9 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('server', function () {
-    var simpleWiki = require('./server/app');
+    var simpleWiki = require('./index');
     grunt.task.run(['wait', 'express-keepalive']);
-    simpleWiki();
+    simpleWiki.server.start();
   });
 
   grunt.registerTask('test', function (target) {
