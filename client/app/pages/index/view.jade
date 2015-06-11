@@ -1,7 +1,7 @@
 div(ng-include='"components/navbar/navbar.html"')
 
 .container.page-index
-  h1 All Articles ({{pagesCtrl.pages.length}})
+  h1 All Pages ({{pagesCtrl.pages.length}})
   hr
 
   ul.md-3-line.p-l-10(ng-repeat='page in pagesCtrl.pages | orderBy:"-created" | limitTo:pagesCtrl.viewingLimit')
@@ -14,6 +14,9 @@ div(ng-include='"components/navbar/navbar.html"')
           dt
             i.fa.fa-clock-o
           dd Created on {{page.formattedCreated}}
+          dt
+            i.fa.fa-eye
+          dd {{page.views}}
        md-divider(ng-if='!$last')
   md-button.md-raised.md-primary(ng-hide='!pagesCtrl.pages.length || pagesCtrl.pages.length <= pagesCtrl.viewingLimit' ng-click='pagesCtrl.incrementViewingLimit()') Show More
 

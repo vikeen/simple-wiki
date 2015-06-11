@@ -13,6 +13,9 @@ div(ng-include='"components/navbar/navbar.html"')
       dt
         i.fa.fa-clock-o
       dd Last edited on {{pageShowCtrl.page.formattedUpdated || pageShowCtrl.page.formattedCreated}}
+      dt
+        i.fa.fa-eye
+      dd {{pageShowCtrl.page.views}}
   hr
   .content
     md-content(ng-bind-html='pageShowCtrl.page.compiledContent')
