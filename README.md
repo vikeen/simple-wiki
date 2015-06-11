@@ -71,3 +71,8 @@ This will connect a development instance of simple-wiki to a user's production p
 ## Maintainers
 
 [vikeen](https://github.com/vikeen)
+
+## History
+
+1.2.0
+ - Added views meta data to pages. This feature has regression support in the source and test suite so don't worry about anything breaking on an update
