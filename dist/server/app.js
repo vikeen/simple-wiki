@@ -6,16 +6,16 @@ var _ = require('lodash');
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var express = require('express');
-var config = require('../config')(process.env.NODE_ENV, process.env.NODE_ENV !== 'production');
 
 // Expose app
 module.exports = function (externalConfig) {
+  var config = require('../config')(process.env.NODE_ENV, process.env.NODE_ENV !== 'production');
   config = _.merge(config, externalConfig);
 
   // Setup server
   var app = express();
   var server = require('http').createServer(app);
-  require('../config/express')(app);
+  require('../config/express')(app, config);
   require('./routes')(app);
 
   server.listen(config.server.port, config.server.ip, function () {

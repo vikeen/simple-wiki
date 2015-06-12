@@ -40,7 +40,7 @@ describe('Configuration', function () {
             productionConfig.server.start();
           } catch (e) {
             should.exist(e);
-            e.should.be.equal('Missing required confiuration: pagePath');
+            e.should.be.equal('Missing required configuration: pagePath');
           }
           done();
         })

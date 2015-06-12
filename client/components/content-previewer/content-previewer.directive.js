@@ -11,7 +11,7 @@ function SimpleWikiContentPreviewerDirective() {
       swModel: '=',
       swOnSubmit: '&'
     },
-    templateUrl: '/components/content-previewer/content-previewer.html',
+    templateUrl: 'components/content-previewer/content-previewer.html',
     controller: 'ContentPreviewerController',
     controllerAs: 'contentPreviewerCtrl',
     bindToController: true,

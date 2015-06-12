@@ -1,21 +1,16 @@
 'use strict';
 
-var express = require('express');
-var favicon = require('serve-favicon');
-var morgan = require('morgan');
-var compression = require('compression');
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
-var cookieParser = require('cookie-parser');
-var errorHandler = require('errorhandler');
-var path = require('path');
-var config = require('./');
+var express = require('express'),
+  favicon = require('serve-favicon'),
+  morgan = require('morgan'),
+  compression = require('compression'),
+  bodyParser = require('body-parser'),
+  methodOverride = require('method-override'),
+  cookieParser = require('cookie-parser'),
+  errorHandler = require('errorhandler'),
+  path = require('path');
 
-if (!config.pagePath) {
-  throw 'config.pagePath is required. Edit the config options to adjust this value'
-}
-
-module.exports = function (app) {
+module.exports = function (app, config) {
   var env = app.get('env');
 
   app.set('views', config.root + '/server/views');
@@ -25,12 +20,6 @@ module.exports = function (app) {
   app.use(bodyParser.json());
   app.use(methodOverride());
   app.use(cookieParser());
-
-  app.use(function (req, res, next) {
-    req.simpleWiki = req.simpleWiki || {};
-    req.simpleWiki.pagePath = config.pagePath;
-    next();
-  });
 
   var faviconPath = config.faviconPath || path.join(config.root, 'public', 'favicon.ico');
   app.use(favicon(faviconPath));
