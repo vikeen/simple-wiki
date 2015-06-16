@@ -41,8 +41,8 @@ describe('Configuration', function () {
           } catch (e) {
             should.exist(e);
             e.should.be.equal('Missing required configuration: pagePath');
+            done();
           }
-          done();
         })
       });
 
@@ -60,13 +60,6 @@ describe('Configuration', function () {
         done();
       });
 
-      //it('should support environment port number', function (done) {
-      //  process.env.PORT = 'dummy port';
-      //  var tempConfig = require('../../dist/');
-      //  tempConfig.server.port.should.be.equal('dummy port');
-      //  done();
-      //});
-
       it('should support manual override for environment port number', function (done) {
         productionConfig.info().server.port = 9005;
         productionConfig.info().server.port.should.be.equal(9005);
@@ -79,13 +72,6 @@ describe('Configuration', function () {
         productionConfig.server.ip.should.be.equal('127.0.0.1');
         done();
       });
-
-      //it('should support environment port number', function (done) {
-      //  process.env.PORT = 'dummy port';
-      //  var tempConfig = require('../../dist/');
-      //  tempConfig.server.port.should.be.equal('dummy port');
-      //  done();
-      //});
 
       it('should support manual override for environment port number', function (done) {
         productionConfig.info().server.ip = 'dummy ip';
