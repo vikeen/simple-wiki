@@ -25,7 +25,75 @@ simpleWiki.server.start();
 
 ## Configuration
 
-@TODO
+#### pagePath (*String*)
+- Absolute file system path for your wiki pages.
+- ***Required***
+
+```javascript
+// Using nodejs path module
+simpleWiki.pagePath = path.join(__dirname, 'pages');
+
+// Or as a constant string
+simpleWiki.pagePath = '/absolute/path/to/page/storage/directory/;
+```
+<br/>
+#### faviconPath (*String*)
+- Absolute file system path for your favicon image.
+
+```javascript
+// Using nodejs path module
+simpleWiki.faviconPath = path.join(__dirname, 'favicon.ico');
+
+// Or as a constant string
+simpleWiki.faviconPath = '/absolute/path/to/favicon.ico;
+```
+<br/>
+#### info (*Function*)
+- Returns the current simple-wiki configuration
+
+```javascript
+var config = simpleWiki.info();
+console.log(config);
+
+/*
+ {
+   env: 'production',
+   root: '/Users/me/dev/simple-wiki/dist/',
+   faviconPath: undefined,
+   pagePath: '/Users/me/dev/simple-wiki-sandbox/pages',
+   server: {
+     port: 9000,
+     ip: '127.0.0.1',
+     start: [Function: start]
+   },
+   info: [Function: info]
+ }
+ */
+```
+<br/>
+#### server.port (*Integer*)
+- The port which you want the wiki to run on. **Default: 9000**.
+
+```javascript
+// Default is 9000
+simpleWiki.server.port = 9001;
+```
+<br/>
+#### server.ip (*String*)
+- The ip which you want the wiki to run on. **Default: 127.0.0.1**
+
+```javascript
+// Default is 127.0.0.1
+simpleWiki.server.ip = '130.541.7.6';
+```
+<br/>
+#### server.start (*Function*)
+- Starts the simple-wiki server
+
+```javascript
+// Using nodejs path module
+simpleWiki.server.start();
+```
 
 ## FAQ
 
