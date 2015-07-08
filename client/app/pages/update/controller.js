@@ -19,7 +19,7 @@ function PageUpdateController($http, $stateParams, toast) {
    */
 
   function onSubmit() {
-    $http.put('/api/pages/' + vm.page.id, vm.page)
+    $http.put('/api/pages/' + vm.page.title, vm.page)
       .success(function () {
         toast.simple('Update successful');
       })
@@ -33,7 +33,7 @@ function PageUpdateController($http, $stateParams, toast) {
    */
 
   function activate() {
-    $http.get('/api/pages/' + $stateParams.id)
+    $http.get('/api/pages/' + $stateParams.title)
       .success(function (page) {
         vm.page = page;
       });

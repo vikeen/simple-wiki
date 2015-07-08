@@ -40,18 +40,22 @@ function create(payload, options) {
       return reject('ERROR_UNSUPPORTED_CONTENT_TYPE');
     }
 
-    _pageExists(options.pagePath, page.id, function (err, exists) {
+    _pageExists(options.pagePath, {
+      title: page.title
+  }, function (err, exists) {
       if (err) {
         _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
         return reject('ERROR_PERFORMING_FILE_LOOKUP');
       }
 
       if (exists) {
-        _handleError(null, 'ERROR_PAGE_ALREADY_EXISTS');
+        _handleError('ERROR_PAGE_ALREADY_EXISTS');
         return reject('ERROR_PAGE_ALREADY_EXISTS');
       }
 
-      var filePath = _buildFilePath(options.pagePath, page.id);
+      var fileName = _buildFileName(page.title, page.id),
+        filePath = _buildFilePath(options.pagePath, fileName);
+
       _writePage(filePath, JSON.stringify(page), function (err, success) {
         if (err) {
           return reject(err);
@@ -96,9 +100,9 @@ function index(options) {
   });
 }
 
-function show(id, options) {
+function show(title, options) {
   return new Promise(function (resolve, reject) {
-    fs.readFile(_buildFilePath(options.pagePath, id), 'utf8', function (err, data) {
+    fs.readFile(_buildFilePath(options.pagePath, title), 'utf8', function (err, data) {
       if (err) {
         _handleError(err, 'ERROR_READING_FROM_PAGE');
         return reject('ERROR_READING_FROM_PAGE');
@@ -107,7 +111,7 @@ function show(id, options) {
       data = JSON.parse(data);
       data.views = data.views ? data.views += 1 : 1;
 
-      var filePath = _buildFilePath(options.pagePath, id);
+      var filePath = _buildFilePath(options.pagePath, title);
       _writePage(filePath, JSON.stringify(data), function (err, success) {
         if (err) {
           return reject(err);
@@ -119,9 +123,10 @@ function show(id, options) {
   });
 }
 
-function update(id, payload, options) {
+function update(title, payload, options) {
   return new Promise(function (resolve, reject) {
     var page = {
+      id: payload.id,
       readableTitle: payload.readableTitle,
       content: payload.content,
       contentType: payload.contentType,
@@ -129,7 +134,7 @@ function update(id, payload, options) {
       updated: new Date()
     };
 
-    _pageExists(options.pagePath, id, function (err, exists) {
+    _pageExists(options.pagePath, title, function (err, exists) {
       if (err || !exists) {
         _handleError(err, 'ERROR_PERFORMING_FILE_LOOKUP');
         return reject('ERROR_PERFORMING_FILE_LOOKUP');
@@ -142,7 +147,7 @@ function update(id, payload, options) {
         return reject('ERROR_UNSUPPORTED_CONTENT_TYPE');
       }
 
-      var filePath = _buildFilePath(options.pagePath, id);
+      var filePath = _buildFilePath(options.pagePath, title);
 
       _readPage(filePath, function (err, data) {
         if (err) {
@@ -168,8 +173,12 @@ function update(id, payload, options) {
  * Private API
  */
 
-function _buildFilePath(base, id) {
-  return path.join(base, id + '.json');
+function _buildFileName(title, id) {
+  return [sha1(title), id, 'json'].join('.');
+}
+
+function _buildFilePath(base, fileName) {
+  return path.join(base, fileName);
 }
 
 function _handleError(error, message) {
@@ -183,23 +192,33 @@ function _handleError(error, message) {
   }
 }
 
-function _pageExists(path, id, callback) {
+/*
+ * @param filter {Object} - Parts of the file to search for
+ */
+function _pageExists(path, filter, callback) {
   fs.readdir(path, function (err, files) {
     if (err) {
       return callback(err, null);
     }
 
-    if (files.indexOf(id + '.json') >= 0) {
-      return callback(null, true);
-    }
+    var files = _.some(files, function(file) {
+      if (files.indexOf(title + '.json') >= 0) {
+        console.log(file);
+        return true;
+      }
+    });
 
-    return callback(null, false);
+      //return callback(null, true);
+
+    //return callback(null, false);
   })
 }
 
 function _normalizePageTitle(title) {
   return title
     .toLowerCase()
+    .trim()
+    .replace(/[^0-9a-zA-Z ]/g, '')
     .replace(/ /g, '_');
 }
 

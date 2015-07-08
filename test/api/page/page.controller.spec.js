@@ -4,6 +4,7 @@ var should = require('should'),
   _ = require('lodash'),
   fs = require('fs'),
   path = require('path'),
+  sha1 = require('node-sha1'),
   testHelpers = require('../../helpers'),
   config = require('../../../config')('test'),
   pageController = require(path.join(config.root, 'server/api/page/page.controller'));
@@ -13,7 +14,7 @@ describe('API Page Controller', function () {
     options = {};
 
   before(function (done) {
-    testHelpers.init(function() {
+    testHelpers.init(function () {
       done();
     });
   });
@@ -22,8 +23,7 @@ describe('API Page Controller', function () {
     page = {
       readableTitle: 'My readable title',
       content: '#Markdown Content',
-      contentType: 'markdown',
-      title: 'My readable title'
+      contentType: 'markdown'
     };
     options = {
       pagePath: config.pagePath
@@ -40,7 +40,7 @@ describe('API Page Controller', function () {
   });
 
   describe('create method', function () {
-    it('should create a valid page', function (done) {
+    it('create a valid page', function (done) {
       pageController.create(page, options).then(function (data) {
         data.should.have.property('readableTitle', 'My readable title');
         data.should.have.property('title', 'my_readable_title');
@@ -49,7 +49,7 @@ describe('API Page Controller', function () {
         data.should.have.property('created');
         data.should.have.property('updated', null);
 
-        var filePath = path.join(config.pagePath, data.id + '.json');
+        var filePath = path.join(config.pagePath, sha1(data.title) + '.' + data.id + '.json');
         fs.readFile(filePath, 'utf-8', function (err, fileData) {
           should.not.exist(err);
           fileData.should.be.equal(JSON.stringify(data));
@@ -58,7 +58,7 @@ describe('API Page Controller', function () {
       });
     });
 
-    it('should fail from an invalid content type', function (done) {
+    it('fail from an invalid content type', function (done) {
       page.contentType = 'unsupport content type';
       pageController.create(page, options)
         .catch(function (err) {
@@ -67,7 +67,7 @@ describe('API Page Controller', function () {
         });
     });
 
-    it('should fail from an invalid page path', function (done) {
+    it('fail from an invalid page path', function (done) {
       options.pagePath = 'invalid';
       pageController.create(page, options).catch(function (err) {
         err.should.be.equal('ERROR_PERFORMING_FILE_LOOKUP');
@@ -75,17 +75,60 @@ describe('API Page Controller', function () {
       });
     });
 
-    it('should have a views meta data attribute', function (done) {
+    it('have a views meta data attribute', function (done) {
       pageController.create(page, options).then(function (newPage) {
         newPage.should.have.property('views', 0);
         done();
       });
     });
 
+    it('fail from a duplicate page', function (done) {
+      pageController.create(page, options).then(function (newPage) {
+        should.exist(newPage);
+        pageController.create(page, options).catch(function (err) {
+          err.should.be.equal('ERROR_PAGE_ALREADY_EXISTS');
+          done();
+        });
+      });
+    });
+
+    describe('normalize the page correctly', function (done) {
+      it('lowercase the page title', function (done) {
+        page.readableTitle = 'UPPERCASE';
+        pageController.create(page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'uppercase');
+          done();
+        });
+      });
+
+      it('trim whitespace', function (done) {
+        page.readableTitle = '    lowercase   ';
+        pageController.create(page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'lowercase');
+          done();
+        });
+      });
+
+      it('replace non alphanumeric or space characters', function (done) {
+        page.readableTitle = '<>{}[]:;!@#$%^&*()_+TITLE<>{}[]:;!@#$%^&*()_+';
+        pageController.create(page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'title');
+          done();
+        });
+      });
+
+      it('replace internal space characters with underscores', function (done) {
+        page.readableTitle = 'this is a new title';
+        pageController.create(page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'this_is_a_new_title');
+          done();
+        });
+      });
+    });
   });
 
   describe('index method', function () {
-    it('should give back all pages', function (done) {
+    it('give back all pages', function (done) {
       pageController.create(page, options).then(function (newPage) {
         pageController.index(options).then(function (data) {
           data.should.have.lengthOf(1);
@@ -96,7 +139,7 @@ describe('API Page Controller', function () {
       });
     });
 
-    it('should fail from an invalid page path', function (done) {
+    it('fail from an invalid page path', function (done) {
       options.pagePath = 'invalid';
       pageController.index(options).catch(function (err) {
         err.should.be.equal('ERROR_PERFORMING_PAGE_DIRECTORY_LOOKUP');
@@ -105,12 +148,12 @@ describe('API Page Controller', function () {
     });
 
     describe('meta data', function () {
-      it('should provide a default view count of 0', function (done) {
+      it('provide a default view count of 0', function (done) {
         pageController.create(page, options).then(function (newPage) {
           delete newPage.views;
           newPage.should.not.have.property('views');
 
-          var filePath = path.join(config.pagePath, newPage.id + '.json');
+          var filePath = path.join(config.pagePath, sha1(newPage.title) + '.' + newPage.id + '.json');
           fs.writeFile(filePath, JSON.stringify(newPage), 'utf-8', function (err) {
             should.not.exist(err);
             pageController.index(options).then(function (pages) {
@@ -126,11 +169,11 @@ describe('API Page Controller', function () {
   });
 
   describe('show method', function () {
-    it('should give back the page', function (done) {
+    it('give back the page', function (done) {
       pageController.create(page, options).then(function (newPage) {
         newPage.should.have.property('views', 0);
 
-        pageController.show(newPage.id, options).then(function (data) {
+        pageController.show(newPage.title, options).then(function (data) {
           data.should.have.property('id', newPage.id);
           data.should.have.property('readableTitle', 'My readable title');
           data.should.have.property('title', 'my_readable_title');
@@ -139,7 +182,7 @@ describe('API Page Controller', function () {
       });
     });
 
-    it('should fail from an invalid page path', function (done) {
+    it('fail from an invalid page path', function (done) {
       pageController.create(page, options).then(function (newPage) {
         options.pagePath = 'invalid';
         pageController.show(newPage.title, options).catch(function (err) {
@@ -150,13 +193,13 @@ describe('API Page Controller', function () {
     });
 
     describe('meta data', function () {
-      it('should update views', function (done) {
+      it('update views', function (done) {
         pageController.create(page, options).then(function (newPage) {
           newPage.should.have.property('views', 0);
-          pageController.show(newPage.id, options).then(function (data) {
+          pageController.show(newPage.title, options).then(function (data) {
             data.should.have.property('id', newPage.id);
             data.should.have.property('views', 1);
-            pageController.show(newPage.id, options).then(function (data) {
+            pageController.show(newPage.title, options).then(function (data) {
               data.should.have.property('id', newPage.id);
               data.should.have.property('views', 2);
               done();
@@ -165,15 +208,15 @@ describe('API Page Controller', function () {
         });
       });
 
-      it('should update the views if it does not exist', function (done) {
+      it('update the views if it does not exist', function (done) {
         pageController.create(page, options).then(function (newPage) {
           delete newPage.views;
           newPage.should.not.have.property('views');
 
-          var filePath = path.join(config.pagePath, newPage.id + '.json');
+          var filePath = path.join(config.pagePath, sha1(newPage.title) + '.' + newPage.id + '.json');
           fs.writeFile(filePath, JSON.stringify(newPage), 'utf-8', function (err) {
             should.not.exist(err);
-            pageController.show(newPage.id, options).then(function (shownPage) {
+            pageController.show(newPage.title, options).then(function (shownPage) {
               shownPage.should.have.property('id', newPage.id);
               shownPage.should.have.property('views', 1);
               done();
@@ -185,34 +228,83 @@ describe('API Page Controller', function () {
   });
 
   describe('update method', function () {
-    it('should fail from an invalid page path', function (done) {
-      pageController.create(page, options).then(function (newPage) {
-        options.pagePath = 'invalid';
-        pageController.update(newPage.title, newPage, options).catch(function (err) {
-          err.should.be.equal('ERROR_PERFORMING_FILE_LOOKUP');
+    before(function (done) {
+      testHelpers.init(function () {
+        done();
+      });
+    });
+
+    beforeEach(function (done) {
+      testHelpers.clean(function () {
+        pageController.create(page, options).then(function (newPage) {
+          page = newPage;
           done();
         });
       });
     });
 
-    it('should fail from an invalid content type', function (done) {
-      pageController.create(page, options).then(function (newPage) {
-        newPage.contentType = 'invalid';
-        pageController.update(newPage.id, newPage, options).catch(function (err) {
-          err.should.be.equal('ERROR_UNSUPPORTED_CONTENT_TYPE');
-          done();
-        });
+    afterEach(function (done) {
+      testHelpers.clean(function () {
+        done();
       });
     });
 
-    it('should update a page', function (done) {
-      pageController.create(page, options).then(function (newPage) {
-        newPage.readableTitle = 'ASD LKJ MVN';
-        pageController.update(newPage.id, newPage, options).then(function (updatedPage) {
-          updatedPage.should.have.property('readableTitle', 'ASD LKJ MVN');
-          updatedPage.should.have.property('title', 'asd_lkj_mvn');
-          should.exist(updatedPage.updated);
-          updatedPage.created.should.not.equal(updatedPage.updated);
+    it('fail from an invalid page path', function (done) {
+      options.pagePath = 'invalid';
+      pageController.update(page.title, page, options).catch(function (err) {
+        err.should.be.equal('ERROR_PERFORMING_FILE_LOOKUP');
+        done();
+      });
+    });
+
+    it('fail from an invalid content type', function (done) {
+      page.contentType = 'invalid';
+      pageController.update(page.title, page, options).catch(function (err) {
+        err.should.be.equal('ERROR_UNSUPPORTED_CONTENT_TYPE');
+        done();
+      });
+    });
+
+    it('update a page', function (done) {
+      page.readableTitle = 'ASD LKJ MVN';
+      pageController.update(page.title, page, options).then(function (updatedPage) {
+        updatedPage.should.have.property('readableTitle', 'ASD LKJ MVN');
+        updatedPage.should.have.property('title', 'asd_lkj_mvn');
+        should.exist(updatedPage.updated);
+        updatedPage.created.should.not.equal(updatedPage.updated);
+        done();
+      });
+    });
+
+    describe('normalize the page correctly', function (done) {
+      it('lowercase the page title', function (done) {
+        page.readableTitle = 'UPPERCASE';
+        pageController.update(page.title, page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'uppercase');
+          done();
+        });
+      });
+
+      it('trim whitespace', function (done) {
+        page.readableTitle = '    lowercase   ';
+        pageController.update(page.title, page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'lowercase');
+          done();
+        });
+      });
+
+      it('replace non alphanumeric or space characters', function (done) {
+        page.readableTitle = '<>{}[]:;!@#$%^&*()_+TITLE<>{}[]:;!@#$%^&*()_+';
+        pageController.update(page.title, page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'title');
+          done();
+        });
+      });
+
+      it('replace internal space characters with underscores', function (done) {
+        page.readableTitle = 'this is a new title';
+        pageController.update(page.title, page, options).then(function (newPage) {
+          newPage.should.have.property('title', 'this_is_a_new_title');
           done();
         });
       });

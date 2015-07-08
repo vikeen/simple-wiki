@@ -9,6 +9,11 @@ var router = express.Router(),
     pagePath: config.pagePath
   };
 
+function _buildErrorPayload(message) {
+  return {
+    error: message
+  };
+}
 
 router.get('/', function (req, res) {
   return controller.index(options)
@@ -16,7 +21,7 @@ router.get('/', function (req, res) {
       res.status(200).send(data);
     })
     .catch(function (err) {
-      res.status(500).send(err);
+      res.status(500).json(_buildErrorPayload(err));
     });
 });
 router.get('/:title', function (req, res) {
@@ -25,7 +30,7 @@ router.get('/:title', function (req, res) {
       res.status(200).send(data);
     })
     .catch(function (err) {
-      res.status(500).send(err);
+      res.status(500).json(_buildErrorPayload(err));
     });
 });
 
@@ -35,7 +40,7 @@ router.post('/', function (req, res) {
       res.status(200).send(data);
     })
     .catch(function (err) {
-      res.status(500).send(err);
+      res.status(500).json(_buildErrorPayload(err));
     });
 });
 
@@ -45,7 +50,7 @@ router.put('/:title', function (req, res) {
       res.status(200).send(data);
     })
     .catch(function (err) {
-      res.status(500).send(err);
+      res.status(500).json(_buildErrorPayload(err));
     });
 });
 

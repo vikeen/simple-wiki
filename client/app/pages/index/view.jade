@@ -8,7 +8,7 @@ div(ng-include='"components/navbar/navbar.html"')
     li.md-list-item-text.list-style-none
       .title
         h1.md-title
-          a(ui-sref='pages:show({id: page.id})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
+          a(ui-sref='pages:show({title: page.title})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
       .meta
         dl
           dt

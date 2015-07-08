@@ -22,7 +22,8 @@ function PageCreateController($http, toast) {
       .success(function () {
         toast.simple('Page created');
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.log(err);
         toast.simple('Failed to create page');
       });
   }

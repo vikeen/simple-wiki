@@ -18,7 +18,7 @@ function PageShowController($http, $stateParams) {
    */
 
   function activate() {
-    $http.get('/api/pages/' + $stateParams.id).success(function (page) {
+    $http.get('/api/pages/' + $stateParams.title).success(function (page) {
       vm.page = page;
       vm.page.formattedCreated = _convertDate(vm.page.created);
       vm.page.formattedUpdated = null;

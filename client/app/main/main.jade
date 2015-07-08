@@ -23,14 +23,14 @@ md-content#mainPage
           = 'Recent Pages'
         ol
           li.md-3-line(ng-repeat='page in mainCtrl.pages | orderBy:"-created" | limitTo:5')
-              a(ui-sref='pages:show({id: page.id})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
+              a(ui-sref='pages:show({title: page.title})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
       md-content.md-padding.col-sm-6
         h2.md-title
           i.fa.fa-eye
           = 'Most Viewed'
         ol
           li.md-3-line(ng-repeat='page in mainCtrl.pages | orderBy:"-views" | limitTo:5')
-            a(ui-sref='pages:show({id: page.id})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
+            a(ui-sref='pages:show({title: page.title})', tooltip='{{page.readableTitle}}') {{page.readableTitle}}
             = ' ({{page.views}})'
     .row
       md-content.md-padding.col-sm-6
