@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/vikeen/simple-wiki.svg)](https://travis-ci.org/vikeen/simple-wiki)
+[![Build Status](https://travis-ci.org/vikeen/simple-wiki.svg?branch=master)](https://travis-ci.org/vikeen/simple-wiki)
 
 [![NPM](https://nodei.co/npm/simple-wiki.png?downloads=true)](https://nodei.co/npm/simple-wiki/)
 
