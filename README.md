@@ -34,7 +34,7 @@ simpleWiki.server.start();
 simpleWiki.pagePath = path.join(__dirname, 'pages');
 
 // Or as a constant string
-simpleWiki.pagePath = '/absolute/path/to/page/storage/directory/;
+simpleWiki.pagePath = '/absolute/path/to/page/storage/directory/';
 ```
 <br/>
 #### faviconPath (*String*)
@@ -45,7 +45,7 @@ simpleWiki.pagePath = '/absolute/path/to/page/storage/directory/;
 simpleWiki.faviconPath = path.join(__dirname, 'favicon.ico');
 
 // Or as a constant string
-simpleWiki.faviconPath = '/absolute/path/to/favicon.ico;
+simpleWiki.faviconPath = '/absolute/path/to/favicon.ico';
 ```
 <br/>
 #### info (*Function*)
