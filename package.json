@@ -36,7 +36,7 @@
     "lodash": "~2.4.1",
     "marked": "^0.3.3",
     "method-override": "~1.0.0",
-    "morgan": "~1.0.0",
+    "morgan": "~1.9.1",
     "node-sha1": "0.0.1",
     "node-uuid": "^1.4.3",
     "serve-favicon": "~2.0.1"
